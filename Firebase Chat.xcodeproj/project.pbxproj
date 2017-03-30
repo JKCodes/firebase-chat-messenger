@@ -12,6 +12,10 @@
 		D86F7EFA1E8D4B2900933F8D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D86F7EF81E8D4B2900933F8D /* Main.storyboard */; };
 		D86F7EFC1E8D4B2900933F8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86F7EFB1E8D4B2900933F8D /* Assets.xcassets */; };
 		D86F7EFF1E8D4B2900933F8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D86F7EFD1E8D4B2900933F8D /* LaunchScreen.storyboard */; };
+		D86F7F0C1E8D4C2B00933F8D /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F0B1E8D4C2B00933F8D /* BaseCell.swift */; };
+		D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F0D1E8D4C4000933F8D /* UIColor + rgb.swift */; };
+		D86F7F101E8D4C4000933F8D /* UIView + Anchors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F0E1E8D4C4000933F8D /* UIView + Anchors.swift */; };
+		D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F111E8D4C5B00933F8D /* LoginController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +26,10 @@
 		D86F7EFB1E8D4B2900933F8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D86F7EFE1E8D4B2900933F8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D86F7F001E8D4B2900933F8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D86F7F0B1E8D4C2B00933F8D /* BaseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
+		D86F7F0D1E8D4C4000933F8D /* UIColor + rgb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor + rgb.swift"; sourceTree = "<group>"; };
+		D86F7F0E1E8D4C4000933F8D /* UIView + Anchors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView + Anchors.swift"; sourceTree = "<group>"; };
+		D86F7F111E8D4C5B00933F8D /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +62,58 @@
 		D86F7EF31E8D4B2900933F8D /* Firebase Chat */ = {
 			isa = PBXGroup;
 			children = (
+				D86F7F0A1E8D4C1800933F8D /* Services */,
+				D86F7F091E8D4C1000933F8D /* Protocols and Extension */,
+				D86F7F081E8D4C0B00933F8D /* Model */,
+				D86F7F071E8D4C0700933F8D /* View */,
+				D86F7F061E8D4BFD00933F8D /* Controller */,
 				D86F7EF41E8D4B2900933F8D /* AppDelegate.swift */,
-				D86F7EF61E8D4B2900933F8D /* ViewController.swift */,
 				D86F7EF81E8D4B2900933F8D /* Main.storyboard */,
 				D86F7EFB1E8D4B2900933F8D /* Assets.xcassets */,
 				D86F7EFD1E8D4B2900933F8D /* LaunchScreen.storyboard */,
 				D86F7F001E8D4B2900933F8D /* Info.plist */,
 			);
 			path = "Firebase Chat";
+			sourceTree = "<group>";
+		};
+		D86F7F061E8D4BFD00933F8D /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7EF61E8D4B2900933F8D /* ViewController.swift */,
+				D86F7F111E8D4C5B00933F8D /* LoginController.swift */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		D86F7F071E8D4C0700933F8D /* View */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7F0B1E8D4C2B00933F8D /* BaseCell.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		D86F7F081E8D4C0B00933F8D /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		D86F7F091E8D4C1000933F8D /* Protocols and Extension */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7F0D1E8D4C4000933F8D /* UIColor + rgb.swift */,
+				D86F7F0E1E8D4C4000933F8D /* UIView + Anchors.swift */,
+			);
+			name = "Protocols and Extension";
+			sourceTree = "<group>";
+		};
+		D86F7F0A1E8D4C1800933F8D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,6 +190,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D86F7EF71E8D4B2900933F8D /* ViewController.swift in Sources */,
+				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
+				D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */,
+				D86F7F0C1E8D4C2B00933F8D /* BaseCell.swift in Sources */,
+				D86F7F101E8D4C4000933F8D /* UIView + Anchors.swift in Sources */,
 				D86F7EF51E8D4B2900933F8D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

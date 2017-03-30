@@ -20,6 +20,7 @@
 		D86F7F161E8D6B5000933F8D /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F151E8D6B5000933F8D /* NewMessageController.swift */; };
 		D86F7F181E8D6CBE00933F8D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F171E8D6CBE00933F8D /* User.swift */; };
 		D86F7F1A1E8D6DB400933F8D /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F191E8D6DB400933F8D /* UserCell.swift */; };
+		D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		D86F7F151E8D6B5000933F8D /* NewMessageController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		D86F7F171E8D6CBE00933F8D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D86F7F191E8D6DB400933F8D /* UserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 			children = (
 				D86F7F0D1E8D4C4000933F8D /* UIColor + rgb.swift */,
 				D86F7F0E1E8D4C4000933F8D /* UIView + Anchors.swift */,
+				D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */,
 			);
 			name = "Protocols and Extension";
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 			files = (
 				D86F7EF71E8D4B2900933F8D /* MessagesController.swift in Sources */,
 				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
+				D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */,
 				D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */,
 				D86F7F181E8D6CBE00933F8D /* User.swift in Sources */,
 				D86F7F1A1E8D6DB400933F8D /* UserCell.swift in Sources */,

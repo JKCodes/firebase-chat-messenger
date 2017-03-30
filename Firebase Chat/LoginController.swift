@@ -74,10 +74,13 @@ class LoginController: UIViewController {
         return tf
     }()
 
-    let profileImageView: UIImageView = {
+    lazy var profileImageView: UIImageView = { [weak self] in
+        guard let this = self else { return UIImageView() }
         let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "gameofthrones_splash")
         imageView.contentMode = .scaleAspectFill
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: this, action: #selector(handleSelectProfileImageView)))
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -126,34 +129,6 @@ class LoginController: UIViewController {
             }
             
             self?.dismiss(animated: true, completion: nil)
-        })
-    }
-    
-    func handleRegister() {
-        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
-            // Error message insert later
-            return
-        }
-        
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user, error) in
-            if error != nil {
-                print(error.debugDescription)
-                return
-            }
-            
-            guard let uid = user?.uid else { return }
-            
-            let ref = FIRDatabase.database().reference()
-            let usersReference = ref.child("users").child(uid)
-            let values = ["name": name, "email": email]
-            usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
-                if err != nil {
-                    print(err.debugDescription)
-                }
-                
-                self.dismiss(animated: true, completion: nil)
-            })
-            
         })
     }
     

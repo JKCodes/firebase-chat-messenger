@@ -1,9 +1,9 @@
 //
 //  LoginController+handlers.swift
-//  gameofchats
+//  Firebase Chat
 //
-//  Created by Brian Voong on 7/4/16.
-//  Copyright © 2016 letsbuildthatapp. All rights reserved.
+//  Created by Joseph Kim on 3/30/17.
+//  Copyright © 2017 Joseph Kim. All rights reserved.
 //
 
 import UIKit
@@ -11,15 +11,69 @@ import Firebase
 
 extension LoginController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    func handleLoginRegister() {
+        if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
+            handleLogin()
+        } else {
+            handleRegister()
+        }
+    }
+    
+    func handleLogin() {
+        guard let email = emailTextField.text, let password = passwordTextField.text else {
+            return
+        }
+        
+        if email == "" || password == "" {
+            displayAlert(title: "Incomplete form", message: "Both fields are required")
+            return
+        }
+        
+        AuthenticationService.instance.signin(email: email, password: password) { [weak self] (error, user) in
+            
+            if error != nil {
+                self?.displayAlert(title: "Unable to login", message: error!)
+                return
+            }
+            
+            self?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func handleLoginRegisterChange() {
+        let title = loginRegisterSegmentedControl.titleForSegment(at: loginRegisterSegmentedControl.selectedSegmentIndex)
+        loginRegisterButton.setTitle(title, for: .normal)
+        
+        inputsContainerViewHeightConstraint?.constant = loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 100 : 150
+        
+        nameTextFieldHeightConstraint?.isActive = false
+        nameTextFieldHeightConstraint = nameTextField.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 0 : 1/3)
+        nameTextFieldHeightConstraint?.isActive = true
+        
+        emailTextFieldHeightConstraint?.isActive = false
+        emailTextFieldHeightConstraint = emailTextField.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 1/2 : 1/3)
+        emailTextFieldHeightConstraint?.isActive = true
+        
+        passwordTextFieldHeightConstraint?.isActive = false
+        passwordTextFieldHeightConstraint = passwordTextField.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 1/2 : 1/3)
+        passwordTextFieldHeightConstraint?.isActive = true
+    }
+    
     func handleRegister() {
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
             return
         }
         
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user: FIRUser?, error) in
+        if email == "" || password == "" || name == "" {
+            displayAlert(title: "Invalid Form", message: "All fields are required")
+            return
+        }
+        
+        AuthenticationService.instance.createUser(email: email, password: password) { [weak self] (error, user) in
+            guard let this = self else { return }
             
             if error != nil {
-                print(error.debugDescription)
+                this.displayAlert(title: "Authentication Error", message: error!)
                 return
             }
             
@@ -27,15 +81,12 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 return
             }
             
-            let imageName = UUID().uuidString
-            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).jpg")
             
-            if let profileImage = self.profileImageView.image, let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
-            
-                storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
-                    
+            if let profileImage = this.profileImageView.image, let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
+                
+                StorageService.instance.uploadToStorage(type: .profile, data: uploadData, onComplete: { (error, metadata) in
                     if error != nil {
-                        print(error.debugDescription)
+                        this.displayAlert(title: "Unexpected Storage Error", message: error!)
                         return
                     }
                     
@@ -43,26 +94,23 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                         
                         let values = ["name": name, "email": email, "profileImageUrl": profileImageUrl]
                         
-                        self.registerUserIntoDatabase(uid: uid, values: values as [String : AnyObject])
+                        this.registerUserIntoDatabase(uid: uid, values: values as [String : AnyObject])
                     }
+                    
                 })
             }
-        })
+        }
     }
     
     private func registerUserIntoDatabase(uid: String, values: [String: AnyObject]) {
-        let ref = FIRDatabase.database().reference()
-        let usersReference = ref.child("users").child(uid)
-        
-        usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
-            
-            if err != nil {
-                print(err.debugDescription)
-                return
+        DatabaseService.instance.saveUser(uid: uid, data: values) { [weak self] (error, data) in
+            guard let this = self else { return }
+            if error != nil {
+                this.displayAlert(title: "Unexpected Database Error", message: error!)
             }
             
-            self.dismiss(animated: true, completion: nil)
-        })
+            this.dismiss(animated: true, completion: nil)
+        }
     }
     
     func handleSelectProfileImageView() {
@@ -94,7 +142,6 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        print("canceled picker")
         dismiss(animated: true, completion: nil)
     }
     

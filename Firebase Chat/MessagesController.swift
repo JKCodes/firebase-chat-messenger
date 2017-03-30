@@ -34,13 +34,12 @@ class MessagesController: UITableViewController {
             return
         }
         
-        FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
-            
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                self.navigationItem.title = dictionary["name"] as? String
+        DatabaseService.instance.retrieveUser(uid: uid) { [weak self] (_, dict) in
+            if let dictionary = dict as? [String: AnyObject] {
+                self?.navigationItem.title = dictionary["name"] as? String
             }
-            
-        }, withCancel: nil)
+        }
+        
     }
     
     func handleNewMessage() {
@@ -51,14 +50,21 @@ class MessagesController: UITableViewController {
     
     func handleLogout() {
         
-        do {
-            try FIRAuth.auth()?.signOut()
-        } catch let logoutError {
-            print(logoutError.localizedDescription)
+        AuthenticationService.instance.signout { (error, _) in
+            if error != nil {
+                displayAlert(title: "Error logging out", message: error!)
+                return
+            }
         }
-        
+    
         let loginController = LoginController()
         present(loginController, animated: true, completion: nil)
+    }
+    
+    func displayAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 }
 

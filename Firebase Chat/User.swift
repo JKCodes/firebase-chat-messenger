@@ -1,10 +1,9 @@
 //
 //  User.swift
-//  gameofchats
+//  Firebase Chat
 //
-//  Created by Brian Voong on 6/29/16.
-//  Copyright © 2016 letsbuildthatapp. All rights reserved.
-//
+//  Created by Joseph Kim on 3/30/17.
+//  Copyright © 2017 Joseph Kim. All rights reserved.//
 
 import UIKit
 

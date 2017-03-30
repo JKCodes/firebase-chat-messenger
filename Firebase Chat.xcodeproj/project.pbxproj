@@ -21,6 +21,11 @@
 		D86F7F181E8D6CBE00933F8D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F171E8D6CBE00933F8D /* User.swift */; };
 		D86F7F1A1E8D6DB400933F8D /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F191E8D6DB400933F8D /* UserCell.swift */; };
 		D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */; };
+		D86F7F1E1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F1D1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift */; };
+		D86F7F231E8D7F7F00933F8D /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F201E8D7F7F00933F8D /* AuthenticationService.swift */; };
+		D86F7F241E8D7F7F00933F8D /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */; };
+		D86F7F251E8D7F7F00933F8D /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F221E8D7F7F00933F8D /* StorageService.swift */; };
+		D86F7F281E8D80C800933F8D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F271E8D80C800933F8D /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +47,11 @@
 		D86F7F171E8D6CBE00933F8D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D86F7F191E8D6DB400933F8D /* UserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
+		D86F7F1D1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageView + loadImageUsingCache.swift"; sourceTree = "<group>"; };
+		D86F7F201E8D7F7F00933F8D /* AuthenticationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		D86F7F221E8D7F7F00933F8D /* StorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		D86F7F271E8D80C800933F8D /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +104,7 @@
 		D86F7EF31E8D4B2900933F8D /* Firebase Chat */ = {
 			isa = PBXGroup;
 			children = (
+				D86F7F261E8D80BB00933F8D /* Helpers */,
 				D86F7F0A1E8D4C1800933F8D /* Services */,
 				D86F7F091E8D4C1000933F8D /* Protocols and Extension */,
 				D86F7F081E8D4C0B00933F8D /* Model */,
@@ -112,6 +123,7 @@
 		D86F7F061E8D4BFD00933F8D /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				D86F7F1F1E8D7D0700933F8D /* Handlers */,
 				D86F7F151E8D6B5000933F8D /* NewMessageController.swift */,
 				D86F7EF61E8D4B2900933F8D /* MessagesController.swift */,
 				D86F7F111E8D4C5B00933F8D /* LoginController.swift */,
@@ -138,9 +150,9 @@
 		D86F7F091E8D4C1000933F8D /* Protocols and Extension */ = {
 			isa = PBXGroup;
 			children = (
+				D86F7F1D1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift */,
 				D86F7F0D1E8D4C4000933F8D /* UIColor + rgb.swift */,
 				D86F7F0E1E8D4C4000933F8D /* UIView + Anchors.swift */,
-				D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */,
 			);
 			name = "Protocols and Extension";
 			sourceTree = "<group>";
@@ -148,8 +160,27 @@
 		D86F7F0A1E8D4C1800933F8D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D86F7F201E8D7F7F00933F8D /* AuthenticationService.swift */,
+				D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */,
+				D86F7F221E8D7F7F00933F8D /* StorageService.swift */,
 			);
 			name = Services;
+			sourceTree = "<group>";
+		};
+		D86F7F1F1E8D7D0700933F8D /* Handlers */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7F1B1E8D713100933F8D /* LoginController+handlers.swift */,
+			);
+			name = Handlers;
+			sourceTree = "<group>";
+		};
+		D86F7F261E8D80BB00933F8D /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7F271E8D80C800933F8D /* Constants.swift */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -281,9 +312,14 @@
 				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
 				D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */,
 				D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */,
+				D86F7F231E8D7F7F00933F8D /* AuthenticationService.swift in Sources */,
 				D86F7F181E8D6CBE00933F8D /* User.swift in Sources */,
+				D86F7F241E8D7F7F00933F8D /* DatabaseService.swift in Sources */,
+				D86F7F251E8D7F7F00933F8D /* StorageService.swift in Sources */,
+				D86F7F1E1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift in Sources */,
 				D86F7F1A1E8D6DB400933F8D /* UserCell.swift in Sources */,
 				D86F7F161E8D6B5000933F8D /* NewMessageController.swift in Sources */,
+				D86F7F281E8D80C800933F8D /* Constants.swift in Sources */,
 				D86F7F101E8D4C4000933F8D /* UIView + Anchors.swift in Sources */,
 				D86F7EF51E8D4B2900933F8D /* AppDelegate.swift in Sources */,
 			);

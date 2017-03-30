@@ -34,7 +34,7 @@ class LoginController: UIViewController {
         guard let this = self else {return UIButton() }
         let button = UIButton(type: .system)
         button.backgroundColor = .rgb(r: 80, g: 101, b: 161)
-        button.setTitle("Login", for: .normal)
+        button.setTitle("Register", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 16)
         button.addTarget(this, action: #selector(handleLoginRegister), for: .touchUpInside)
@@ -85,7 +85,7 @@ class LoginController: UIViewController {
         guard let this = self else { return UISegmentedControl() }
         let sc = UISegmentedControl(items: ["Login", "Register"])
         sc.tintColor = .white
-        sc.selectedSegmentIndex = 0
+        sc.selectedSegmentIndex = 1
         sc.addTarget(this, action: #selector(handleLoginRegisterChange), for: .valueChanged)
         return sc
     }()

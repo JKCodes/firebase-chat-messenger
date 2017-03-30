@@ -36,6 +36,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 return
             }
             
+            self?.delegate?.fetchUserAndSetupNavBarTitle()
             self?.dismiss(animated: true, completion: nil)
         }
     }
@@ -109,6 +110,9 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 this.displayAlert(title: "Unexpected Database Error", message: error!)
             }
             
+            let user = User()
+            user.setValuesForKeys(values)
+            self?.delegate?.setupNavBarWithUser(user: user)
             this.dismiss(animated: true, completion: nil)
         }
     }

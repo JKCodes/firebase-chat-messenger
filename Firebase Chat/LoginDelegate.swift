@@ -6,4 +6,9 @@
 //  Copyright © 2017 Joseph Kim. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+protocol LoginDelegate: class {
+    func fetchUserAndSetupNavBarTitle()
+    func setupNavBarWithUser(user: User)
+}

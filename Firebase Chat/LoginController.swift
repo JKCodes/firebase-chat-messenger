@@ -17,6 +17,8 @@ class LoginController: UIViewController {
     private let profileImageLength: CGFloat = 150
     private let segmentedControlHeight: CGFloat = 36
     
+    weak var delegate: LoginDelegate?
+    
     internal var inputsContainerViewHeightConstraint: NSLayoutConstraint?
     internal var nameTextFieldHeightConstraint: NSLayoutConstraint?
     internal var emailTextFieldHeightConstraint: NSLayoutConstraint?

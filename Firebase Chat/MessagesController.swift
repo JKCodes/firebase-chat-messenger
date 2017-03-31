@@ -16,6 +16,7 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     
     var messages = [Message]()
     var messagesDictionary = [String: Message]()
+    var timer: Timer?
     
     let titleView: UIView = {
         let view = UIView()
@@ -49,13 +50,6 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         checkIfUserIsLoggedIn()
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
-        
-        messages.removeAll()
-        messagesDictionary.removeAll()
-        tableView.reloadData()
-        
-        observeUserMessages()
-        
     }
     override func viewWillAppear(_ animated: Bool) {
 
@@ -84,11 +78,16 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
                         }
                     }
                     
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
+                    this.timer?.invalidate()
+                    this.timer = Timer.scheduledTimer(timeInterval: 0.1, target: this, selector: #selector(this.handleReloadTable), userInfo: nil, repeats: false)
                 }
             })
+        }
+    }
+    
+    func handleReloadTable() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
         }
     }
     
@@ -118,6 +117,13 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     }
     
     func setupNavBarWithUser(user: User) {
+        
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        
+        observeUserMessages()
+
         
         navigationItem.title = user.name
         

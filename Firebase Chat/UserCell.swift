@@ -19,13 +19,28 @@ class UserCell: UITableViewCell {
         didSet {
             setupNameAndProfileImage()
             
-            detailTextLabel?.text = message?.text
+            
+            if let chatPartnerId = message?.toId, let text = message?.text {
+                
+                detailTextLabel?.text = chatPartnerId == AuthenticationService.instance.currentId() ? text : "You: \(text)"
+
+            }
             
             if let timeStamp = message?.timestamp, let seconds = Double(timeStamp) {
                 let timestampeDate = Date(timeIntervalSince1970: seconds)
+                let elapsedTimeInSeconds = Date().timeIntervalSince(timestampeDate)
+                let secondsInADay: TimeInterval = 60 * 60 * 24
                 
                 let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "hh:mm:ss a"
+                
+                if elapsedTimeInSeconds > 7 * secondsInADay {
+                    dateFormatter.dateFormat = "MM/dd/yy"
+                } else if elapsedTimeInSeconds > secondsInADay {
+                    dateFormatter.dateFormat = "EEE"
+                } else {
+                    dateFormatter.dateFormat = "hh:mm:ss a"
+                }
+                
                 timeLabel.text = dateFormatter.string(from: timestampeDate)
             }
             

@@ -78,7 +78,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, Alerte
         if let text = inputTextField.text, let toId = user?.id, let fromId = AuthenticationService.instance.currentId() {
             let values = ["text": text, "toId": toId, "fromId": fromId, "timestamp": "\(Date().timeIntervalSince1970)"]
         
-            DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>) { [weak self] (error, _) in
+            DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>, fan: true) { [weak self] (error, _) in
                 guard let this = self else { return }
                 
                 if let error = error {

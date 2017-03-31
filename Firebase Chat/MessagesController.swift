@@ -50,39 +50,39 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
-        observeMessages()
     }
     
-    func observeMessages() {
-        DatabaseService.instance.retrieveMultipleObjects(type: .message) { [weak self] (snapshot) in
-            guard let this = self else { return }
+    func observeUserMessages() {
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages) { (snapshot) in
+            let messageId = snapshot.key
             
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                let message = Message()
-                message.setValuesForKeys(dictionary)
-                this.messages.append(message)
+            DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
+                guard let this = self else { return }
                 
-                if let toId = message.toId {
-                    this.messagesDictionary[toId] = message
-                
-                    this.messages = Array(this.messagesDictionary.values)
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    let message = Message()
+                    message.setValuesForKeys(dictionary)
+                    this.messages.append(message)
                     
-                    this.messages.sort { (message1, message2) -> Bool in
-                        guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
+                    if let toId = message.toId {
+                        this.messagesDictionary[toId] = message
                         
-                        return Int(time1) > Int(time2)
+                        this.messages = Array(this.messagesDictionary.values)
+                        
+                        this.messages.sort { (message1, message2) -> Bool in
+                            guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
+                            
+                            return Int(time1) > Int(time2)
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
                     }
                 }
-                
-                
-                
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-            }
+            })
         }
     }
-
     
     func checkIfUserIsLoggedIn() {
         if AuthenticationService.instance.currentId() == nil {
@@ -110,6 +110,13 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     }
     
     func setupNavBarWithUser(user: User) {
+        
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        
+        observeUserMessages()
+        
         navigationItem.title = user.name
         
         // Width for titleView is arbitrary, and it does not matter

@@ -17,18 +17,7 @@ class UserCell: UITableViewCell {
     
     var message: Message? {
         didSet {
-            if let toId = message?.toId {
-                DatabaseService.instance.retrieveSingleObject(queryString: toId, type: .user, onComplete: { [weak self] (snapshot) in
-                    if let dictionary = snapshot.value as? [String: AnyObject] {
-                        self?.textLabel?.text = dictionary["name"] as? String
-                        
-                        if let profileImageUrl = dictionary["profileImageUrl"] as? String {
-                            self?.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
-                        }
-                        
-                    }
-                })
-            }
+            setupNameAndProfileImage()
             
             detailTextLabel?.text = message?.text
             
@@ -53,7 +42,6 @@ class UserCell: UITableViewCell {
     
     let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "HH:MM:SS"
         label.font = .systemFont(ofSize: 13)
         label.textColor = .darkGray
         return label
@@ -69,6 +57,29 @@ class UserCell: UITableViewCell {
         profileImageView.anchorCenterYToSuperview()
         timeLabel.anchor(top: topAnchor, left: nil, bottom: nil, right: rightAnchor, topConstant: contentOffset * 2, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: timeLabelWidth, heightConstant: 0)
         
+    }
+    
+    private func setupNameAndProfileImage() {
+        let chatPartnerId: String?
+        
+        if message?.fromId == AuthenticationService.instance.currentId() {
+            chatPartnerId = message?.toId
+        } else {
+            chatPartnerId = message?.fromId
+        }
+        
+        if let id = chatPartnerId {
+            DatabaseService.instance.retrieveSingleObject(queryString: id, type: .user, onComplete: { [weak self] (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    self?.textLabel?.text = dictionary["name"] as? String
+                    
+                    if let profileImageUrl = dictionary["profileImageUrl"] as? String {
+                        self?.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
+                    }
+                    
+                }
+            })
+        }
     }
     
     override func layoutSubviews() {

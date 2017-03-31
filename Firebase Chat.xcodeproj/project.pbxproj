@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		93EDC7BD35C222F7658F2F12 /* Pods_Firebase_Chat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9367DC4449CC3395B661C8C /* Pods_Firebase_Chat.framework */; };
 		D8010FF91E8E975B00D8C759 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8010FF81E8E975B00D8C759 /* Message.swift */; };
+		D8010FFB1E8EC4FF00D8C759 /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8010FFA1E8EC4FF00D8C759 /* ChatMessageCell.swift */; };
 		D854864A1E8D9BC300A19BC0 /* LoginDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85486491E8D9BC300A19BC0 /* LoginDelegate.swift */; };
 		D86F7EF51E8D4B2900933F8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7EF41E8D4B2900933F8D /* AppDelegate.swift */; };
 		D86F7EF71E8D4B2900933F8D /* MessagesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7EF61E8D4B2900933F8D /* MessagesController.swift */; };
@@ -38,6 +39,7 @@
 		BEEAFDC887EDC49F038347A1 /* Pods-Firebase Chat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Firebase Chat.release.xcconfig"; path = "Pods/Target Support Files/Pods-Firebase Chat/Pods-Firebase Chat.release.xcconfig"; sourceTree = "<group>"; };
 		C7B58AF8F43BF624F3FACC3A /* Pods-Firebase Chat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Firebase Chat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Firebase Chat/Pods-Firebase Chat.debug.xcconfig"; sourceTree = "<group>"; };
 		D8010FF81E8E975B00D8C759 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		D8010FFA1E8EC4FF00D8C759 /* ChatMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
 		D85486491E8D9BC300A19BC0 /* LoginDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDelegate.swift; sourceTree = "<group>"; };
 		D86F7EF11E8D4B2900933F8D /* Firebase Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Firebase Chat.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86F7EF41E8D4B2900933F8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				D86F7F191E8D6DB400933F8D /* UserCell.swift */,
+				D8010FFA1E8EC4FF00D8C759 /* ChatMessageCell.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D86F7EF71E8D4B2900933F8D /* MessagesController.swift in Sources */,
+				D8010FFB1E8EC4FF00D8C759 /* ChatMessageCell.swift in Sources */,
 				D854864A1E8D9BC300A19BC0 /* LoginDelegate.swift in Sources */,
 				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
 				D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */,

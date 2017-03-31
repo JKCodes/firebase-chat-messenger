@@ -14,4 +14,8 @@ class Message: NSObject {
     var fromId: String?
     var toId: String?
     var timestamp: String?
+    
+    func chatPartnerId() -> String? {
+        return fromId == AuthenticationService.instance.currentId() ? toId : fromId
+    }
 }

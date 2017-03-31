@@ -60,15 +60,8 @@ class UserCell: UITableViewCell {
     }
     
     private func setupNameAndProfileImage() {
-        let chatPartnerId: String?
-        
-        if message?.fromId == AuthenticationService.instance.currentId() {
-            chatPartnerId = message?.toId
-        } else {
-            chatPartnerId = message?.fromId
-        }
-        
-        if let id = chatPartnerId {
+                
+        if let id = message?.chatPartnerId() {
             DatabaseService.instance.retrieveSingleObject(queryString: id, type: .user, onComplete: { [weak self] (snapshot) in
                 if let dictionary = snapshot.value as? [String: AnyObject] {
                     self?.textLabel?.text = dictionary["name"] as? String

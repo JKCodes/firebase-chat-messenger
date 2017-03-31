@@ -8,8 +8,11 @@
 
 import UIKit
 
-class ChatLogController: UICollectionViewController, UITextFieldDelegate, Alerter {
+class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, Alerter {
     
+    private let cellId = "cellId"
+    
+    private let cellHeight: CGFloat = 80
     private let containerViewHeight: CGFloat = 50
     private let buttonWidth: CGFloat = 80
     private let buttonHeight: CGFloat = 50
@@ -20,11 +23,16 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, Alerte
     var user: User? {
         didSet {
             navigationItem.title = user?.name
+            
+            observeMessages()
         }
     }
     
+    var messages = [Message]()
+    
     let containerView: UIView = {
         let view = UIView()
+        view.backgroundColor = .white
         return view
     }()
     
@@ -53,9 +61,34 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, Alerte
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
+        collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
         setupInputComponents()
+    }
+    
+    func observeMessages() {
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages) { (snapshot) in
+            
+            let messageId = snapshot.key
+            
+            DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
+                guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+                
+                let message = Message()
+                message.setValuesForKeys(dictionary)
+                
+                if message.chatPartnerId() == self?.user?.id {
+                    self?.messages.append(message)
+                    
+                    DispatchQueue.main.async {
+                        self?.collectionView?.reloadData()
+                    }
+                }
+                
+            })
+        }
     }
     
     func setupInputComponents() {
@@ -91,5 +124,22 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, Alerte
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         handleSend()
         return true
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
+        
+        let message = messages[indexPath.item]
+        cell.textView.text = message.text
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: view.frame.width, height: cellHeight)
     }
 }

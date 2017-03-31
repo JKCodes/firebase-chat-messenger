@@ -50,8 +50,16 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        
+        observeUserMessages()
+        
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+
+    }
     func observeUserMessages() {
         DatabaseService.instance.retrieveMultipleObjects(type: .userMessages) { (snapshot) in
             let messageId = snapshot.key
@@ -111,13 +119,9 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     
     func setupNavBarWithUser(user: User) {
         
-        messages.removeAll()
-        messagesDictionary.removeAll()
-        tableView.reloadData()
-        
-        observeUserMessages()
-        
         navigationItem.title = user.name
+        
+        navigationItem.titleView = titleView
         
         // Width for titleView is arbitrary, and it does not matter
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: contentHeight)
@@ -138,7 +142,6 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         nameLabel.anchor(top: nil, left: profileImageView.rightAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 8, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: contentHeight)
         nameLabel.anchorCenterYToSuperview()
         
-        navigationItem.titleView = titleView
         
         //titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
     }
@@ -187,6 +190,20 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         cell.message = message
                 
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+        
+        guard let chatPartnerId = message.chatPartnerId() else { return }
+        
+        DatabaseService.instance.retrieveSingleObject(queryString: chatPartnerId, type: .user) { [weak self] (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            let user = User()
+            user.id = chatPartnerId
+            user.setValuesForKeys(dictionary)
+            self?.showChatController(user: user)
+        }
     }
 }
 

@@ -20,6 +20,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     private let contentOffset: CGFloat = 8
     private let separatorHeight: CGFloat = 1
     
+    private var containerViewBottomConstraint: NSLayoutConstraint?
+    
     var user: User? {
         didSet {
             navigationItem.title = user?.name
@@ -58,16 +60,43 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         return sv
     }()
     
+    lazy var inputContainerView: UIView = { [weak self] in
+        guard let this = self else { return UIView() }
+        let containerView = UIView()
+        containerView.frame = CGRect(x: 0, y: 0, width: this.view.frame.width, height: this.containerViewHeight)
+        containerView.backgroundColor = .white
+        containerView.addSubview(this.sendButton)
+        containerView.addSubview(this.inputTextField)
+        containerView.addSubview(this.separatorView)
+        
+        this.sendButton.anchor(top: nil, left: nil, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: this.buttonWidth, heightConstant: this.buttonHeight)
+        this.sendButton.anchorCenterYToSuperview()
+        this.inputTextField.anchor(top: nil, left: containerView.leftAnchor, bottom: nil, right: this.sendButton.leftAnchor, topConstant: 0, leftConstant: this.contentOffset, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: this.inputTextFieldHeight)
+        this.inputTextField.anchorCenterYToSuperview()
+        this.separatorView.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: this.separatorHeight)
+        
+        return containerView
+    }()
+    
+    override var inputAccessoryView: UIView? {
+        get {
+            return inputContainerView
+        }
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        collectionView?.contentInset = UIEdgeInsets(top: contentOffset, left: 0, bottom: inputTextFieldHeight + contentOffset, right: 0)
-        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: inputTextFieldHeight, right: 0)
+        collectionView?.contentInset = UIEdgeInsets(top: contentOffset, left: 0, bottom: contentOffset, right: 0)
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
-        setupInputComponents()
+        collectionView?.keyboardDismissMode = .interactive
     }
     
     func observeMessages() {
@@ -93,24 +122,13 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         }
     }
     
-    func setupInputComponents() {
-        
-        view.addSubview(containerView)
-        containerView.addSubview(sendButton)
-        containerView.addSubview(inputTextField)
-        containerView.addSubview(separatorView)
-        
-        containerView.anchor(top: nil, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: containerViewHeight)
-        sendButton.anchor(top: nil, left: nil, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: buttonWidth, heightConstant: buttonHeight)
-        sendButton.anchorCenterYToSuperview()
-        inputTextField.anchor(top: nil, left: containerView.leftAnchor, bottom: nil, right: sendButton.leftAnchor, topConstant: 0, leftConstant: contentOffset, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: inputTextFieldHeight)
-        inputTextField.anchorCenterYToSuperview()
-        separatorView.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: separatorHeight)
-    
-    }
-    
     func handleSend() {
         if let text = inputTextField.text, let toId = user?.id, let fromId = AuthenticationService.instance.currentId() {
+            if text == "" {
+                self.present(alertVC(title: "Empty message detected", message: "Please enter something"), animated: true, completion: nil)
+                return
+            }
+            
             let values = ["text": text, "toId": toId, "fromId": fromId, "timestamp": "\(Date().timeIntervalSince1970)"]
         
             DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>, fan: true) { [weak self] (error, _) in
@@ -175,8 +193,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             cellHeight = estimateFrame(text: text).height + contentOffset * 2
         }
         
-        
-        return CGSize(width: view.frame.width, height: cellHeight)
+        let width = UIScreen.main.bounds.width
+        return CGSize(width: width, height: cellHeight)
     }
     
     private func estimateFrame(text: String) -> CGRect {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class LoginController: UIViewController, Alerter {
+class LoginController: UIViewController, UITextFieldDelegate, Alerter {
     
     private let contentOffset: CGFloat = 12
     private let containerViewHeight: CGFloat = 150
@@ -96,6 +96,10 @@ class LoginController: UIViewController, Alerter {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        nameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
 
         view.backgroundColor = .rgb(r: 61, g: 91, b: 151)
         view.addSubview(inputContainerView)
@@ -107,6 +111,15 @@ class LoginController: UIViewController, Alerter {
         setupLoginRegisterButton()
         setupProfileImageView()
         setupLoginRegisterSegmentedControl()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
     }
     
     func setupInputsContainerView() {

@@ -15,6 +15,7 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     private static let contentRadius: CGFloat = 20
     
     var messages = [Message]()
+    var messagesDictionary = [String: Message]()
     
     let titleView: UIView = {
         let view = UIView()
@@ -47,16 +48,33 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         
         checkIfUserIsLoggedIn()
         
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
+        
         observeMessages()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
     }
     
     func observeMessages() {
         DatabaseService.instance.retrieveMultipleObjects(type: .message) { [weak self] (snapshot) in
+            guard let this = self else { return }
+            
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 let message = Message()
                 message.setValuesForKeys(dictionary)
-                self?.messages.append(message)
+                this.messages.append(message)
+                
+                if let toId = message.toId {
+                    this.messagesDictionary[toId] = message
+                
+                    this.messages = Array(this.messagesDictionary.values)
+                    
+                    this.messages.sort { (message1, message2) -> Bool in
+                        guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
+                        
+                        return Int(time1) > Int(time2)
+                    }
+                }
+                
+                
                 
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
@@ -150,13 +168,17 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         return messages.count
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         
         let message = messages[indexPath.row]
-        cell.textLabel?.text = message.toId
-        cell.detailTextLabel?.text = message.text
         
+        cell.message = message
+                
         return cell
     }
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		93EDC7BD35C222F7658F2F12 /* Pods_Firebase_Chat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9367DC4449CC3395B661C8C /* Pods_Firebase_Chat.framework */; };
+		D8010FF91E8E975B00D8C759 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8010FF81E8E975B00D8C759 /* Message.swift */; };
 		D854864A1E8D9BC300A19BC0 /* LoginDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85486491E8D9BC300A19BC0 /* LoginDelegate.swift */; };
 		D86F7EF51E8D4B2900933F8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7EF41E8D4B2900933F8D /* AppDelegate.swift */; };
 		D86F7EF71E8D4B2900933F8D /* MessagesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7EF61E8D4B2900933F8D /* MessagesController.swift */; };
@@ -27,12 +28,16 @@
 		D86F7F241E8D7F7F00933F8D /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */; };
 		D86F7F251E8D7F7F00933F8D /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F221E8D7F7F00933F8D /* StorageService.swift */; };
 		D86F7F281E8D80C800933F8D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86F7F271E8D80C800933F8D /* Constants.swift */; };
+		D8D897A21E8E763A00A5BDAC /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A11E8E763A00A5BDAC /* ChatLogController.swift */; };
+		D8D897A41E8E7F1600A5BDAC /* Alerter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A31E8E7F1600A5BDAC /* Alerter.swift */; };
+		D8D897A61E8E871900A5BDAC /* NewMessagesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A9367DC4449CC3395B661C8C /* Pods_Firebase_Chat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Firebase_Chat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEEAFDC887EDC49F038347A1 /* Pods-Firebase Chat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Firebase Chat.release.xcconfig"; path = "Pods/Target Support Files/Pods-Firebase Chat/Pods-Firebase Chat.release.xcconfig"; sourceTree = "<group>"; };
 		C7B58AF8F43BF624F3FACC3A /* Pods-Firebase Chat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Firebase Chat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Firebase Chat/Pods-Firebase Chat.debug.xcconfig"; sourceTree = "<group>"; };
+		D8010FF81E8E975B00D8C759 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		D85486491E8D9BC300A19BC0 /* LoginDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDelegate.swift; sourceTree = "<group>"; };
 		D86F7EF11E8D4B2900933F8D /* Firebase Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Firebase Chat.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86F7EF41E8D4B2900933F8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -54,6 +59,9 @@
 		D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
 		D86F7F221E8D7F7F00933F8D /* StorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		D86F7F271E8D80C800933F8D /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		D8D897A11E8E763A00A5BDAC /* ChatLogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
+		D8D897A31E8E7F1600A5BDAC /* Alerter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alerter.swift; sourceTree = "<group>"; };
+		D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessagesDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +137,7 @@
 				D86F7F151E8D6B5000933F8D /* NewMessageController.swift */,
 				D86F7EF61E8D4B2900933F8D /* MessagesController.swift */,
 				D86F7F111E8D4C5B00933F8D /* LoginController.swift */,
+				D8D897A11E8E763A00A5BDAC /* ChatLogController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -145,6 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				D86F7F171E8D6CBE00933F8D /* User.swift */,
+				D8010FF81E8E975B00D8C759 /* Message.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -166,6 +176,8 @@
 				D86F7F211E8D7F7F00933F8D /* DatabaseService.swift */,
 				D86F7F221E8D7F7F00933F8D /* StorageService.swift */,
 				D85486491E8D9BC300A19BC0 /* LoginDelegate.swift */,
+				D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */,
+				D8D897A31E8E7F1600A5BDAC /* Alerter.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -315,10 +327,14 @@
 				D854864A1E8D9BC300A19BC0 /* LoginDelegate.swift in Sources */,
 				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
 				D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */,
+				D8D897A61E8E871900A5BDAC /* NewMessagesDelegate.swift in Sources */,
 				D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */,
 				D86F7F231E8D7F7F00933F8D /* AuthenticationService.swift in Sources */,
+				D8010FF91E8E975B00D8C759 /* Message.swift in Sources */,
 				D86F7F181E8D6CBE00933F8D /* User.swift in Sources */,
 				D86F7F241E8D7F7F00933F8D /* DatabaseService.swift in Sources */,
+				D8D897A41E8E7F1600A5BDAC /* Alerter.swift in Sources */,
+				D8D897A21E8E763A00A5BDAC /* ChatLogController.swift in Sources */,
 				D86F7F251E8D7F7F00933F8D /* StorageService.swift in Sources */,
 				D86F7F1E1E8D76F300933F8D /* UIImageView + loadImageUsingCache.swift in Sources */,
 				D86F7F1A1E8D6DB400933F8D /* UserCell.swift in Sources */,

@@ -7,12 +7,14 @@
 //
 
 import UIKit
-import Firebase
 
-class MessagesController: UITableViewController, LoginDelegate {
+class MessagesController: UITableViewController, LoginDelegate, NewMessagesDelegate, Alerter {
     
+    private let cellId = "cellId"
     private let contentHeight: CGFloat = 40
     private static let contentRadius: CGFloat = 20
+    
+    var messages = [Message]()
     
     let titleView: UIView = {
         let view = UIView()
@@ -44,10 +46,28 @@ class MessagesController: UITableViewController, LoginDelegate {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "new_message_icon"), style: .plain, target: self, action: #selector(handleNewMessage))
         
         checkIfUserIsLoggedIn()
+        
+        observeMessages()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
     }
     
+    func observeMessages() {
+        DatabaseService.instance.retrieveMultipleObjects(type: .message) { [weak self] (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                let message = Message()
+                message.setValuesForKeys(dictionary)
+                self?.messages.append(message)
+                
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            }
+        }
+    }
+
+    
     func checkIfUserIsLoggedIn() {
-        if FIRAuth.auth()?.currentUser?.uid == nil {
+        if AuthenticationService.instance.currentId() == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
             
@@ -56,12 +76,12 @@ class MessagesController: UITableViewController, LoginDelegate {
     }
     
     func fetchUserAndSetupNavBarTitle() {
-        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+        guard let uid = AuthenticationService.instance.currentId() else {
             return
         }
         
-        DatabaseService.instance.retrieveUser(uid: uid) { [weak self] (_, dict) in
-            if let dictionary = dict as? [String: AnyObject] {
+        DatabaseService.instance.retrieveSingleObject(queryString: uid, type: .user) { [weak self] (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
                 self?.navigationItem.title = dictionary["name"] as? String
                 
                 let user = User()
@@ -94,10 +114,20 @@ class MessagesController: UITableViewController, LoginDelegate {
         nameLabel.anchorCenterYToSuperview()
         
         navigationItem.titleView = titleView
+        
+        //titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+    }
+    
+    func showChatController(user: User) {
+        let layout = UICollectionViewFlowLayout()
+        let chatLogController = ChatLogController(collectionViewLayout: layout)
+        chatLogController.user = user
+        navigationController?.pushViewController(chatLogController, animated: true)
     }
     
     func handleNewMessage() {
         let newMessageController = NewMessageController()
+        newMessageController.delegate = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -105,8 +135,8 @@ class MessagesController: UITableViewController, LoginDelegate {
     func handleLogout() {
         
         AuthenticationService.instance.signout { (error, _) in
-            if error != nil {
-                displayAlert(title: "Error logging out", message: error!)
+            if let error = error {
+                self.present(alertVC(title: "Error logging out", message: error), animated: true, completion: nil)
                 return
             }
         }
@@ -116,10 +146,18 @@ class MessagesController: UITableViewController, LoginDelegate {
         present(loginController, animated: true, completion: nil)
     }
     
-    func displayAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
+        
+        let message = messages[indexPath.row]
+        cell.textLabel?.text = message.toId
+        cell.detailTextLabel?.text = message.text
+        
+        return cell
     }
 }
 

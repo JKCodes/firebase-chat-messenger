@@ -17,6 +17,14 @@ class AuthenticationService {
         return _instance
     }
     
+    func currentId() -> String? {
+        if let id = FIRAuth.auth()?.currentUser?.uid {
+            return id
+        }
+        
+        return nil
+    }
+    
     func createUser(email: String, password: String, onComplete: Completion?) {
     
         FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { [weak self] (user, error) in

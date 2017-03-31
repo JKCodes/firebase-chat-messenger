@@ -7,9 +7,8 @@
 //
 
 import UIKit
-import Firebase
 
-class LoginController: UIViewController {
+class LoginController: UIViewController, Alerter {
     
     private let contentOffset: CGFloat = 12
     private let containerViewHeight: CGFloat = 150
@@ -179,11 +178,5 @@ class LoginController: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
-    }
-    
-    func displayAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
     }
 }

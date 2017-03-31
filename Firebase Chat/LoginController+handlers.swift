@@ -25,19 +25,21 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         }
         
         if email == "" || password == "" {
-            displayAlert(title: "Incomplete form", message: "Both fields are required")
+            self.present(alertVC(title: "Incomplete form", message: "Both fields are required"), animated: true, completion: nil)
             return
         }
         
         AuthenticationService.instance.signin(email: email, password: password) { [weak self] (error, user) in
             
-            if error != nil {
-                self?.displayAlert(title: "Unable to login", message: error!)
+            guard let this = self else { return }
+            
+            if let error = error {
+                this.present(this.alertVC(title: "Unable to login", message: error), animated: true, completion: nil)
                 return
             }
             
-            self?.delegate?.fetchUserAndSetupNavBarTitle()
-            self?.dismiss(animated: true, completion: nil)
+            this.delegate?.fetchUserAndSetupNavBarTitle()
+            this.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -66,15 +68,15 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         }
         
         if email == "" || password == "" || name == "" {
-            displayAlert(title: "Invalid Form", message: "All fields are required")
+            self.present(alertVC(title: "Invalid Form", message: "All fields are required"), animated: true, completion: nil)
             return
         }
         
         AuthenticationService.instance.createUser(email: email, password: password) { [weak self] (error, user) in
             guard let this = self else { return }
             
-            if error != nil {
-                this.displayAlert(title: "Authentication Error", message: error!)
+            if let error = error {
+                this.present(this.alertVC(title: "Authentication Error", message: error), animated: true, completion: nil)
                 return
             }
             
@@ -86,8 +88,8 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             if let profileImage = this.profileImageView.image, let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
                 
                 StorageService.instance.uploadToStorage(type: .profile, data: uploadData, onComplete: { (error, metadata) in
-                    if error != nil {
-                        this.displayAlert(title: "Unexpected Storage Error", message: error!)
+                    if let error = error {
+                        this.present(this.alertVC(title: "Unexpected Storage Error", message: error), animated: true, completion: nil)
                         return
                     }
                     
@@ -104,10 +106,10 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     private func registerUserIntoDatabase(uid: String, values: [String: AnyObject]) {
-        DatabaseService.instance.saveUser(uid: uid, data: values) { [weak self] (error, data) in
+        DatabaseService.instance.saveData(uid: uid, type: .user, data: values) { [weak self] (error, data) in
             guard let this = self else { return }
-            if error != nil {
-                this.displayAlert(title: "Unexpected Database Error", message: error!)
+            if let error = error {
+                this.present(this.alertVC(title: "Unexpected Database Error", message: error), animated: true, completion: nil)
             }
             
             let user = User()

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Firebase
 import FirebaseStorage
 
 let FIR_CHILD_PROFILEIMG = "profile_images"

@@ -8,10 +8,16 @@
 
 import Foundation
 import FirebaseDatabase
-import FirebaseAuth
 
 let FIR_CHILD_USERS = "users"
 let FIR_CHILD_PROFILE = "profile"
+let FIR_CHILD_MESSAGES = "messages"
+
+enum DataTypes {
+    case user
+    case message
+}
+
 
 class DatabaseService {
     private static let _instance = DatabaseService()
@@ -28,27 +34,65 @@ class DatabaseService {
         return rootRef.child(FIR_CHILD_USERS)
     }
     
+    var messagesRef: FIRDatabaseReference {
+        return rootRef.child(FIR_CHILD_MESSAGES)
+    }
     
-    func saveUser(uid: String, data: Dictionary<String, AnyObject>, onComplete: Completion?) {
+    func saveData(uid: String?, type: DataTypes, data: Dictionary<String, AnyObject>, onComplete: Completion?) {
+        if uid == nil && type == .user { fatalError("uid is required if a user is to be saved") }
         
-        let userReference = usersRef.child(uid)
+        let uniqueRef: FIRDatabaseReference
         
-        userReference.updateChildValues(data) { (error, ref) in
+        switch type {
+        case .message: uniqueRef = messagesRef.childByAutoId()
+        case .user: uniqueRef = usersRef.child(uid!)
+        }
+        
+        uniqueRef.updateChildValues(data) { (error, _) in
             if error != nil {
-                onComplete?("Error saving user to the database", nil)
+                onComplete?("Error saving data to the database", nil)
             }
-            
             onComplete?(nil, nil)
-            
         }
     }
     
-    func retrieveUser(uid: String, onComplete: Completion?) {
-        usersRef.child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+    
+    func retrieveSingleObject(queryString: String, type: DataTypes, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+        
+        let ref: FIRDatabaseReference
+        
+        switch type {
+        case .user: ref = usersRef.child(queryString)
+        case .message: ref = messagesRef.child(queryString)
+        }
+        
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
-            onComplete?(nil, snapshot.value as AnyObject?)
+            onComplete?(snapshot)
             
         }, withCancel: nil)
+    }
+    
+    func retrieveMultipleObjects(type: DataTypes, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+        
+        let ref: FIRDatabaseReference
+        
+        switch type {
+        case .user: ref = usersRef
+        case .message: ref = messagesRef
+        }
+        
+        ref.observe(.childAdded, with: { (snapshot) in
+            onComplete?(snapshot)
+        }, withCancel: nil)
+    }
+    
+    private func retrieveOne() {
+        
+    }
+    
+    private func retrieveMany() {
+        
     }
     
 }

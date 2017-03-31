@@ -1,5 +1,5 @@
 //
-//  Extensions.swift
+//  UIImageView + loadImageUsingCache.swift
 //  Firebase Chat
 //
 //  Created by Joseph Kim on 3/30/17.
@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Firebase
 
 let imageCache = NSCache<NSString, UIImage>()
 

@@ -72,8 +72,8 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
                     message.setValuesForKeys(dictionary)
                     this.messages.append(message)
                     
-                    if let toId = message.toId {
-                        this.messagesDictionary[toId] = message
+                    if let chatPartnerId = message.chatPartnerId() {
+                        this.messagesDictionary[chatPartnerId] = message
                         
                         this.messages = Array(this.messagesDictionary.values)
                         

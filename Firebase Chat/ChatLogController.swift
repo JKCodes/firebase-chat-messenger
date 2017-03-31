@@ -12,7 +12,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     
     private let cellId = "cellId"
     
-    private let cellHeight: CGFloat = 80
+    private var cellHeight: CGFloat = 80
     private let containerViewHeight: CGFloat = 50
     private let buttonWidth: CGFloat = 80
     private let buttonHeight: CGFloat = 50
@@ -61,6 +61,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        collectionView?.contentInset = UIEdgeInsets(top: contentOffset, left: 0, bottom: inputTextFieldHeight + contentOffset, right: 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: inputTextFieldHeight, right: 0)
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
@@ -117,6 +119,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 if let error = error {
                     this.present(this.alertVC(title: "Error saving to database", message: error), animated: true, completion: nil)
                 }
+                
+                this.inputTextField.text = nil
             }
         }
     }
@@ -136,10 +140,31 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         let message = messages[indexPath.item]
         cell.textView.text = message.text
         
+        if let text = message.text {
+            cell.bubbleWidthConstraint?.constant = estimateFrame(text: text).width + contentOffset * 3
+        }
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if let text = messages[indexPath.item].text {
+            cellHeight = estimateFrame(text: text).height + contentOffset * 2
+        }
+        
+        
         return CGSize(width: view.frame.width, height: cellHeight)
+    }
+    
+    private func estimateFrame(text: String) -> CGRect {
+        let size = CGSize(width: ChatMessageCell.cellWidth, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: ChatMessageCell.textViewFontSize)]
+        
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: attributes, context: nil)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView?.collectionViewLayout.invalidateLayout()
     }
 }

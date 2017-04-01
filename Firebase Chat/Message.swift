@@ -10,10 +10,12 @@ import UIKit
 
 class Message: NSObject {
     
-    var text: String?
     var fromId: String?
     var toId: String?
     var timestamp: String?
+
+    var text: String?
+    var imageUrl: String?
     
     func chatPartnerId() -> String? {
         return fromId == AuthenticationService.instance.currentId() ? toId : fromId

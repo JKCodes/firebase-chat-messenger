@@ -10,9 +10,11 @@ import Foundation
 import FirebaseStorage
 
 let FIR_CHILD_PROFILEIMG = "profile_images"
+let FIR_CHILD_IMAGE = "message_images"
 
 enum StorageTypes {
     case profile
+    case image
 }
 
 
@@ -32,23 +34,26 @@ class StorageService {
         return rootRef.child(FIR_CHILD_PROFILEIMG)
     }
     
-    func uploadToStorage(type: StorageTypes, data: Data, onComplete: @escaping Completion) {
+    var messageImgRef: FIRStorageReference {
+        return rootRef.child(FIR_CHILD_PROFILEIMG)
+    }
+    
+    func uploadToStorage(type: StorageTypes, data: Data, onComplete: ((_ error: String?, _ metadata: FIRStorageMetadata?) -> Void)?) {
         
         let ref: FIRStorageReference
         
         switch type {
-        case .profile:
-            ref = profileRef.child("\(NSUUID().uuidString).jpg")
-            break
+        case .profile: ref = profileRef.child("\(NSUUID().uuidString).jpg")
+        case .image: ref = messageImgRef.child("\(NSUUID().uuidString).jpg")
         }
-        
+                
         ref.put(data, metadata: nil) { (metadata, error) in
             
             if error != nil {
-                onComplete("An error has occurred while trying to save data to Firebase storage", nil)
+                onComplete?("An error has occurred while trying to save data to Firebase storage", nil)
             }
             
-            onComplete(nil, metadata)
+            onComplete?(nil, metadata)
         }
     }
     

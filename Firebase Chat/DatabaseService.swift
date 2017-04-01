@@ -91,7 +91,7 @@ class DatabaseService {
         }
     }
     
-    
+    /// For simple retrieval such as a single message or a user
     func retrieveSingleObject(queryString: String, type: DataTypes, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
         guard let currentId = AuthenticationService.instance.currentId() else { return }
         
@@ -110,35 +110,81 @@ class DatabaseService {
         }, withCancel: nil)
     }
     
-    func retrieveMultipleObjects(type: DataTypes, fan: Bool = false, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
-        guard let currentId = AuthenticationService.instance.currentId() else { return }
+    /// For complex retrievals such as user-messages (one or two level search) and a retrieval of group of users or messages (one level search)
+    func retrieveMultipleObjects(type: DataTypes, eventType: FIRDataEventType, fromId: String?, toId: String?, propagate: Bool?, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+        let from = fromId ?? ""
+        let to = toId ?? ""
+        var prop = propagate ?? true  // if the propagation is set to false, one level searching will be used
         
-        let ref: FIRDatabaseReference
-        
-        switch type {
-        case .user: ref = usersRef
-        case .message: ref = messagesRef
-        case .userMessages: ref = userMessagesRef.child(currentId)
+        // Propagation is overriden to false if toId is not nil, for toId automatically assumes a two level search
+        if to != "" {
+            prop = false
         }
         
-        if fan {
-            retrieveFanObjects(childRef: ref, onComplete: onComplete)
+        guard let ref = getRef(type: type, fromId: from, toId: to) else { return }
+        
+        if type == .userMessages && prop {
+            retrieveFanObjectsForUnknownToId(childRef: ref, eventType: eventType, onComplete: onComplete)
         } else {
-            ref.observe(.childAdded, with: { (snapshot) in
+            ref.observe(eventType, with: { (snapshot) in
                 onComplete?(snapshot)
             }, withCancel: nil)
         }
     }
     
-    private func retrieveFanObjects(childRef: FIRDatabaseReference, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+    // For unknown toId
+    private func retrieveFanObjectsForUnknownToId(childRef: FIRDatabaseReference, eventType: FIRDataEventType, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
         childRef.observe(.childAdded, with: { (snapshot) in
             let typeId = snapshot.key
             
-            childRef.child(typeId).observe(.childAdded, with: { (snapshot) in
+            childRef.child(typeId).observe(eventType, with: { (snapshot) in
                 onComplete?(snapshot)
             }, withCancel: nil)
         }, withCancel: nil)
         
+    }
+    
+    /// For complex removals such as user-message groups
+    func removeMultipleObjects(type: DataTypes, fromId: String?, toId: String?, onComplete: Completion?) {
+        let from = fromId ?? ""
+        let to = toId ?? ""
+        
+        guard let ref = getRef(type: type, fromId: from, toId: to) else { return }
+        
+        ref.removeValue { (error, _) in
+            if error != nil {
+                onComplete?("There was a problem handling the deletion request.  Please try again.", nil)
+            }
+            
+            onComplete?(nil, nil)
+        }
+    }
+    
+    // Used to get refs for retrievals and removals
+    private func getRef(type: DataTypes, fromId: String, toId: String) -> FIRDatabaseReference? {
+        guard var currentId = AuthenticationService.instance.currentId() else { return nil }
+        
+        if fromId != "" {
+            currentId = fromId
+        }
+        
+        var ref: FIRDatabaseReference
+        
+        switch type {
+        case .user: ref = usersRef
+        case .message: ref = messagesRef
+        case .userMessages: ref = userMessagesRef
+        }
+        
+        if type == .userMessages {
+            if toId != "" {
+                return ref.child(currentId).child(toId)
+            } else {
+                return ref.child(currentId)
+            }
+        } else {
+            return ref
+        }
     }
     
 }

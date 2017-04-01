@@ -29,7 +29,7 @@ class NewMessageController: UITableViewController {
     
     func fetchUser() {
         
-        DatabaseService.instance.retrieveMultipleObjects(type: .user) { [weak self] (snapshot) in
+        DatabaseService.instance.retrieveMultipleObjects(type: .user, eventType: .childAdded, fromId: nil, toId: nil, propagate: nil) { [weak self] (snapshot) in
            
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 let user = User()

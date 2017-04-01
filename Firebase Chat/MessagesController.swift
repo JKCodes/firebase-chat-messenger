@@ -50,16 +50,46 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         checkIfUserIsLoggedIn()
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
+        
+        tableView.allowsMultipleSelectionDuringEditing = true
     }
-    override func viewWillAppear(_ animated: Bool) {
 
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
     }
-    func observeUserMessages() {        
-        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, fan: true) { [weak self] (snapshot) in
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+
+        let message = messages[indexPath.row]
+
+        guard let uid = AuthenticationService.instance.currentId(), let toId = message.chatPartnerId() else { return }
+        
+        DatabaseService.instance.removeMultipleObjects(type: .userMessages, fromId: uid, toId: toId) { [weak self] (error, _) in
+            guard let this = self else { return }
+
+            if let error = error {
+                this.present(this.alertVC(title: "Deletion request failed", message: error), animated: true, completion: nil)
+                return
+            }
+            
+            self?.messagesDictionary.removeValue(forKey: toId)
+        }
+    }
+    
+    func observeUserMessages() {
+        
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, eventType: .childAdded, fromId: nil, toId: nil, propagate: true) { [weak self] (snapshot) in
             
             let messageId = snapshot.key
             
             self?.fetchMessage(messageId: messageId)
+            self?.attemptReloadOfTable()
+        }
+        
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, eventType: .childRemoved, fromId: nil, toId: nil, propagate: false) { [weak self] (snapshot) in
+            
+            self?.messagesDictionary.removeValue(forKey: snapshot.key)
+            self?.attemptReloadOfTable()
         }
     }
     
@@ -82,7 +112,6 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 let message = Message(dictionary: dictionary)
-//                this.messages.append(message)
                 
                 if let chatPartnerId = message.chatPartnerId() {
                     this.messagesDictionary[chatPartnerId] = message
@@ -156,8 +185,6 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         nameLabel.anchor(top: nil, left: profileImageView.rightAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 8, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: contentHeight)
         nameLabel.anchorCenterYToSuperview()
         
-        
-        //titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
     }
     
     func showChatController(user: User) {
@@ -176,9 +203,10 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     
     func handleLogout() {
         
-        AuthenticationService.instance.signout { (error, _) in
+        AuthenticationService.instance.signout { [weak self] (error, _) in
+            guard let this = self else { return }
             if let error = error {
-                self.present(alertVC(title: "Error logging out", message: error), animated: true, completion: nil)
+                this.present(this.alertVC(title: "Error logging out", message: error), animated: true, completion: nil)
                 return
             }
         }

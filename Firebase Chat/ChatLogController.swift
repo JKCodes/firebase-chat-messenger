@@ -140,9 +140,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     func observeMessages() {
-
-        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, fan: true) { (snapshot) in
-            
+        guard let toId = user?.id else { return }
+        
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, eventType: .childAdded, fromId: nil, toId: toId, propagate: true) { (snapshot) in
+           
             let messageId = snapshot.key
             
             DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in

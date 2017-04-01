@@ -87,7 +87,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             
             if let profileImage = this.profileImageView.image, let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
                 
-                StorageService.instance.uploadToStorage(type: .profile, data: uploadData, onComplete: { (error, metadata) in
+                StorageService.instance.uploadToStorage(type: .profile, data: uploadData, url: nil, onComplete: { (error, metadata) in
                     if let error = error {
                         this.present(this.alertVC(title: "Unexpected Storage Error", message: error), animated: true, completion: nil)
                         return

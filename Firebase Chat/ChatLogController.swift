@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import MobileCoreServices
+import AVFoundation
 
 class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChatMessageDelegate, Alerter {
     
@@ -162,12 +164,77 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         
         imagePickerConroller.delegate = self
         imagePickerConroller.allowsEditing = true
+        imagePickerConroller.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
         
         present(imagePickerConroller, animated: true, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
+        if let videoUrl = info[UIImagePickerControllerMediaURL] as? URL {
+            handleVideoSelected(url: videoUrl)
+        } else {
+            handleImageSelected(info: info as [String : AnyObject])
+        }
+        
+        dismiss(animated: true, completion: nil)
+    
+    }
+    
+    private func handleVideoSelected(url: URL) {
+        let uploadTask = StorageService.instance.uploadToStorageAndReturn(type: .video, data: nil, url: url) { [weak self] (error, metadata) in
+            guard let this = self else { return }
+            
+            if let error = error {
+                this.present(this.alertVC(title: "Unexpected upload error", message: error), animated: true, completion: nil)
+                return
+            }
+            
+            if let videoUrl = metadata?.downloadURL()?.absoluteString {
+                
+                if let thumbnailImage = this.thumbnailImage(fileUrl: url) {
+                    
+                    this.uploadToFirebaseStorage(image: thumbnailImage, completion: { (imageUrl) in
+                    
+                        let properties: [String: AnyObject] = ["imageUrl": imageUrl as AnyObject, "imageWidth": thumbnailImage.size.width as AnyObject, "imageHeight": thumbnailImage.size.height as AnyObject, "videoUrl": videoUrl as AnyObject ]
+                        this.sendMessage(properties: properties)
+                    })
+            
+                }
+            }
+        }
+        
+        uploadTask.observe(.progress) { [weak self] (snapshot) in
+            guard let this = self else { return }
+            
+            if let current = snapshot.progress?.fractionCompleted {
+                let percentage = Int(current * 100)
+                this.navigationItem.title = "Uploading Video: \(percentage)%"
+            }
+        }
+        
+        uploadTask.observe(.success) { [weak self] (snapshot) in
+            guard let this = self else { return }
+            this.navigationItem.title = this.user?.name
+        }
+
+    }
+    
+    private func thumbnailImage(fileUrl: URL) -> UIImage? {
+        let asset = AVAsset(url: fileUrl)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
+        do {
+            let thumbnailCGImage = try imageGenerator.copyCGImage(at: CMTimeMake(1, 60), actualTime: nil)
+            return UIImage(cgImage: thumbnailCGImage)
+        } catch let err {
+            print(err.localizedDescription)
+        }
+        
+        return nil
+    }
+    
+    private func handleImageSelected(info: [String: AnyObject]) {
         var selectedImageFromPicker: UIImage?
         
         if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
@@ -178,31 +245,30 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         }
         
         if let selectedImage = selectedImageFromPicker {
-            uploadToFirebaseStorage(image: selectedImage)
+            uploadToFirebaseStorage(image: selectedImage, completion: { [weak self] (imageUrl) in
+                self?.sendMessage(imageUrl: imageUrl, image: selectedImage)
+            })
         }
-        
-        dismiss(animated: true, completion: nil)
-        
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
     
-    private func uploadToFirebaseStorage(image: UIImage) {
+    private func uploadToFirebaseStorage(image: UIImage, completion: @escaping (_ imageUrl: String) -> ()) {
         
         if let uploadData = UIImageJPEGRepresentation(image, 0.2) {
             
-            StorageService.instance.uploadToStorage(type: .profile, data: uploadData, onComplete: { [weak self] (error, metadata) in
+            StorageService.instance.uploadToStorage(type: .profile, data: uploadData, url: nil, onComplete: { [weak self] (error, metadata) in
                 guard let this = self else { return }
                 
                 if let error = error {
-                    this.present(this.alertVC(title: "Unexpected Storage Error", message: error), animated: true, completion: nil)
+                    this.present(this.alertVC(title: "Unexpected upload Error", message: error), animated: true, completion: nil)
                     return
                 }
                                 
                 if let imageUrl = metadata?.downloadURL()?.absoluteString {
-                    this.sendMessage(imageUrl: imageUrl, image: image)
+                    completion(imageUrl)
                 }
                 
             })

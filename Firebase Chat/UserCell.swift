@@ -20,10 +20,20 @@ class UserCell: UITableViewCell {
             setupNameAndProfileImage()
             
             
-            if let chatPartnerId = message?.toId, let text = message?.text {
+            if let chatPartnerId = message?.toId {
                 
-                detailTextLabel?.text = chatPartnerId == AuthenticationService.instance.currentId() ? text : "You: \(text)"
-
+                var displayText = ""
+                
+                if let text = message?.text {
+                    displayText = text
+                } else if let _ = message?.videoUrl {
+                    displayText = "Sent a video"
+                } else {
+                    displayText = "Sent an image"
+                }
+                
+                detailTextLabel?.text = chatPartnerId == AuthenticationService.instance.currentId() ? displayText : "You: \(displayText)"
+                
             }
             
             if let timeStamp = message?.timestamp, let seconds = Double(timeStamp) {

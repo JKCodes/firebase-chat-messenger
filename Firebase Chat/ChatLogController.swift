@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, Alerter {
+class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChatMessageDelegate, Alerter {
     
     private let cellId = "cellId"
     
@@ -33,6 +33,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     var messages = [Message]()
+    
+    var startingFrame: CGRect?
+    var zoomingImageView: UIImageView?
+    var blackBackgroundView: UIView?
+    var startImageView: UIImageView?
     
     let containerView: UIView = {
         let view = UIView()
@@ -250,6 +255,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         
+        cell.delegate = self
+        
         let message = messages[indexPath.item]
         cell.textView.text = message.text
         
@@ -257,8 +264,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         
         if let text = message.text {
             cell.bubbleWidthConstraint?.constant = estimateFrame(text: text).width + contentOffset * 3
+            cell.textView.isHidden = false
         } else if message.imageUrl != nil {
             cell.bubbleWidthConstraint?.constant = messageImageWidth
+            cell.textView.isHidden = true
         }
         
         return cell
@@ -300,8 +309,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         if let text = message.text {
             cellHeight = estimateFrame(text: text).height + contentOffset * 2
         } else if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue {
-            
             cellHeight = CGFloat(imageHeight / imageWidth) * messageImageWidth
+            
         }
         
         let width = UIScreen.main.bounds.width
@@ -318,5 +327,63 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         collectionView?.collectionViewLayout.invalidateLayout()
+    }
+    
+    func performZoomInfoStartingImageView(startingImageView: UIImageView) {
+        startingFrame = startingImageView.superview?.convert(startingImageView.frame, to: nil)
+        guard let startFrame = startingFrame, let keyWindow = UIApplication.shared.keyWindow else { return }
+        
+        zoomingImageView = UIImageView(frame: startFrame)
+        blackBackgroundView = UIView(frame: keyWindow.frame)
+        
+        guard let zoomView = zoomingImageView else { return }
+        guard let backView = blackBackgroundView else { return }
+
+        startImageView = startingImageView
+        startImageView?.isHidden = true
+        
+        zoomView.image = startingImageView.image
+        zoomView.isUserInteractionEnabled = true
+        zoomView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomOut)))
+        
+        backView.backgroundColor = .black
+        backView.alpha = 0
+        
+        keyWindow.addSubview(backView)
+        keyWindow.addSubview(zoomView)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: { [weak self] in
+            
+            backView.alpha = 1
+            self?.inputContainerView.alpha = 0
+            
+            let height = startFrame.height / startFrame.width * keyWindow.frame.width
+            
+            zoomView.frame = CGRect(x: 0, y: 0, width: keyWindow.frame.width, height: height)
+            zoomView.center = keyWindow.center
+        }, completion: nil)
+        
+        
+    }
+    
+    func handleZoomOut(tapGesture: UITapGestureRecognizer) {
+        guard let startFrame = startingFrame, let zoomOutImageView = zoomingImageView else { return }
+        zoomOutImageView.layer.cornerRadius = 16
+        zoomOutImageView.clipsToBounds = true
+        
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: { [weak self] in
+            guard let this = self else { return }
+            
+            zoomOutImageView.frame = startFrame
+            this.blackBackgroundView?.alpha = 0
+            this.inputContainerView.alpha = 1
+        }) { [weak self] (completed) in
+            guard let this = self else { return }
+            
+            this.startImageView?.isHidden = false
+            zoomOutImageView.removeFromSuperview()
+            this.blackBackgroundView?.removeFromSuperview()
+        }
     }
 }

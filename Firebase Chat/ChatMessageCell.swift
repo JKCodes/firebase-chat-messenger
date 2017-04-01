@@ -24,6 +24,8 @@ class ChatMessageCell: UICollectionViewCell {
     internal var bubbleRightConstraint: NSLayoutConstraint?
     internal var bubbleLeftConstraint: NSLayoutConstraint?
     
+    weak var delegate: ChatMessageDelegate?
+    
     let textView: UITextView = {
         let tv = UITextView()
         tv.text = "Temp"
@@ -50,11 +52,14 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
-    let messageImageView: UIImageView = {
+    lazy var messageImageView: UIImageView = { [weak self] in
+        guard let this = self else { return UIImageView() }
         let imageView = UIImageView()
         imageView.layer.cornerRadius = profileImageRadius
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: this, action: #selector(handleZoomTap)))
         return imageView
     }()
     
@@ -79,6 +84,11 @@ class ChatMessageCell: UICollectionViewCell {
         textView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         
         profileImageView.anchor(top: nil, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 0, leftConstant: contentOffset, bottomConstant: 0, rightConstant: 0, widthConstant: profileImageLength, heightConstant: profileImageLength)
+    }
+    
+    func handleZoomTap(tapGesture: UITapGestureRecognizer) {
+        guard let imageView = tapGesture.view as? UIImageView else { return }
+        delegate?.performZoomInfoStartingImageView(startingImageView: imageView)
     }
     
     required init?(coder aDecoder: NSCoder) {

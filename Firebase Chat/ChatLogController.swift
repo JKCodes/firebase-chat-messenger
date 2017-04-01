@@ -100,7 +100,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     func observeMessages() {
-        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages) { (snapshot) in
+
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, fan: true) { (snapshot) in
             
             let messageId = snapshot.key
             
@@ -110,14 +111,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 let message = Message()
                 message.setValuesForKeys(dictionary)
                 
-                if message.chatPartnerId() == self?.user?.id {
-                    self?.messages.append(message)
-                    
-                    DispatchQueue.main.async {
-                        self?.collectionView?.reloadData()
-                    }
-                }
+                self?.messages.append(message)
                 
+                DispatchQueue.main.async {
+                    self?.collectionView?.reloadData()
+                }
             })
         }
     }

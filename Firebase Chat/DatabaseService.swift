@@ -68,11 +68,11 @@ class DatabaseService {
         }
     }
     
-    func saveFanData(childRef: FIRDatabaseReference, data: Dictionary<String, AnyObject>, onComplete: Completion?) {
+    private func saveFanData(childRef: FIRDatabaseReference, data: Dictionary<String, AnyObject>, onComplete: Completion?) {
         guard let fromId = data["fromId"] as? String, let toId = data["toId"] as? String else { return }
         
-        let senderRef = userMessagesRef.child(fromId)
-        let receiverRef = userMessagesRef.child(toId)
+        let senderRef = userMessagesRef.child(fromId).child(toId)
+        let receiverRef = userMessagesRef.child(toId).child(fromId)
         
         let typeId = childRef.key
         
@@ -110,9 +110,9 @@ class DatabaseService {
         }, withCancel: nil)
     }
     
-    func retrieveMultipleObjects(type: DataTypes, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+    func retrieveMultipleObjects(type: DataTypes, fan: Bool = false, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
         guard let currentId = AuthenticationService.instance.currentId() else { return }
-
+        
         let ref: FIRDatabaseReference
         
         switch type {
@@ -121,16 +121,23 @@ class DatabaseService {
         case .userMessages: ref = userMessagesRef.child(currentId)
         }
         
-        ref.observe(.childAdded, with: { (snapshot) in
-            onComplete?(snapshot)
+        if fan {
+            retrieveFanObjects(childRef: ref, onComplete: onComplete)
+        } else {
+            ref.observe(.childAdded, with: { (snapshot) in
+                onComplete?(snapshot)
+            }, withCancel: nil)
+        }
+    }
+    
+    private func retrieveFanObjects(childRef: FIRDatabaseReference, onComplete: ((_ snapshot: FIRDataSnapshot) -> Void)?) {
+        childRef.observe(.childAdded, with: { (snapshot) in
+            let typeId = snapshot.key
+            
+            childRef.child(typeId).observe(.childAdded, with: { (snapshot) in
+                onComplete?(snapshot)
+            }, withCancel: nil)
         }, withCancel: nil)
-    }
-    
-    private func retrieveOne() {
-        
-    }
-    
-    private func retrieveMany() {
         
     }
     

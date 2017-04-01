@@ -54,42 +54,51 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
     override func viewWillAppear(_ animated: Bool) {
 
     }
-    func observeUserMessages() {
-        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages) { (snapshot) in
+    func observeUserMessages() {        
+        DatabaseService.instance.retrieveMultipleObjects(type: .userMessages, fan: true) { [weak self] (snapshot) in
+            
             let messageId = snapshot.key
             
-            DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
-                guard let this = self else { return }
-                
-                if let dictionary = snapshot.value as? [String: AnyObject] {
-                    let message = Message()
-                    message.setValuesForKeys(dictionary)
-                    this.messages.append(message)
-                    
-                    if let chatPartnerId = message.chatPartnerId() {
-                        this.messagesDictionary[chatPartnerId] = message
-                        
-                        this.messages = Array(this.messagesDictionary.values)
-                        
-                        this.messages.sort { (message1, message2) -> Bool in
-                            guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
-                            
-                            return Int(time1) > Int(time2)
-                        }
-                    }
-                    
-                    this.timer?.invalidate()
-                    this.timer = Timer.scheduledTimer(timeInterval: 0.1, target: this, selector: #selector(this.handleReloadTable), userInfo: nil, repeats: false)
-                }
-            })
+            self?.fetchMessage(messageId: messageId)
         }
     }
     
     func handleReloadTable() {
+        messages = Array(messagesDictionary.values)
+        messages.sort { (message1, message2) -> Bool in
+            guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
+            
+            return Int(time1) > Int(time2)
+        }
+
         DispatchQueue.main.async { [weak self] in
             self?.tableView.reloadData()
         }
     }
+    
+    private func fetchMessage(messageId: String) {
+        DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
+            guard let this = self else { return }
+            
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                let message = Message()
+                message.setValuesForKeys(dictionary)
+                this.messages.append(message)
+                
+                if let chatPartnerId = message.chatPartnerId() {
+                    this.messagesDictionary[chatPartnerId] = message
+                }
+                
+                self?.attemptReloadOfTable()
+            }
+        })
+    }
+    
+    private func attemptReloadOfTable() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+    }
+    
     
     func checkIfUserIsLoggedIn() {
         if AuthenticationService.instance.currentId() == nil {

@@ -323,7 +323,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         
         cell.delegate = self
         
+        
         let message = messages[indexPath.item]
+        
+        cell.message = message
+
         cell.textView.text = message.text
         
         setupCell(cell: cell, message: message)
@@ -335,6 +339,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             cell.bubbleWidthConstraint?.constant = messageImageWidth
             cell.textView.isHidden = true
         }
+        
+        cell.playButton.isHidden = message.videoUrl == nil
         
         return cell
     }

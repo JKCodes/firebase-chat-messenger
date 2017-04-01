@@ -20,6 +20,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     private let contentOffset: CGFloat = 8
     private let separatorHeight: CGFloat = 1
     private let uploadImageLength: CGFloat = 44
+    private let messageImageWidth: CGFloat = 200
     
     private var containerViewBottomConstraint: NSLayoutConstraint?
     
@@ -110,6 +111,25 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
         collectionView?.keyboardDismissMode = .interactive
+        
+        setupKeyboardObservers()
+    }
+    
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardDidShow), name: .UIKeyboardDidShow, object: nil)
+    }
+    
+    func handleKeyboardDidShow() {
+        if messages.count > 0 {
+            let indexPath = IndexPath(item: messages.count - 1, section: 0)
+            collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
     }
     
     func observeMessages() {
@@ -119,15 +139,14 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             let messageId = snapshot.key
             
             DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
-                guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+                guard let this = self, let dictionary = snapshot.value as? [String: AnyObject] else { return }
                 
-                let message = Message()
-                message.setValuesForKeys(dictionary)
-                
-                self?.messages.append(message)
+                this.messages.append(Message(dictionary: dictionary))
                 
                 DispatchQueue.main.async {
-                    self?.collectionView?.reloadData()
+                    let indexPath = IndexPath(item: this.messages.count - 1, section: 0)
+                    this.collectionView?.reloadData()
+                    this.collectionView?.scrollToItem(at: indexPath, at: .bottom, animated: true)
                 }
             })
         }
@@ -178,7 +197,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 }
                                 
                 if let imageUrl = metadata?.downloadURL()?.absoluteString {
-                    this.sendMessage(imageUrl: imageUrl)
+                    this.sendMessage(imageUrl: imageUrl, image: image)
                 }
                 
             })
@@ -186,41 +205,36 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
 
     
-    private func sendMessage(imageUrl: String) {
-        if let toId = user?.id, let fromId = AuthenticationService.instance.currentId() {
-            
-            let values = ["imageUrl": imageUrl, "toId": toId, "fromId": fromId, "timestamp": "\(Date().timeIntervalSince1970)"]
-            
-            DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>, fan: true) { [weak self] (error, _) in
-                guard let this = self else { return }
-                
-                if let error = error {
-                    this.present(this.alertVC(title: "Error saving to database", message: error), animated: true, completion: nil)
-                }
-                
-                this.inputTextField.text = nil
-            }
-        }
+    private func sendMessage(imageUrl: String, image: UIImage) {
+        
+        let properties: [String: AnyObject] = ["imageUrl": imageUrl as AnyObject, "imageWidth": image.size.width as AnyObject, "imageHeight": image.size.height as AnyObject]
+        
+        sendMessage(properties: properties)
     }
     
     func handleSend() {
-        if let text = inputTextField.text, let toId = user?.id, let fromId = AuthenticationService.instance.currentId() {
-            if text == "" {
-                self.present(alertVC(title: "Empty message detected", message: "Please enter something"), animated: true, completion: nil)
-                return
+        guard let text = inputTextField.text else { return }
+        
+        let properties: [String: AnyObject] = ["text": text as AnyObject]
+        
+        sendMessage(properties: properties)
+    }
+    
+    private func sendMessage(properties: [String: AnyObject]) {
+        guard let toId = user?.id, let fromId = AuthenticationService.instance.currentId() else { return }
+        
+        var values: [String: AnyObject] = ["toId": toId as AnyObject, "fromId": fromId as AnyObject, "timestamp": "\(Date().timeIntervalSince1970)" as AnyObject]
+        
+        properties.forEach({values[$0] = $1 })
+        
+        DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>, fan: true) { [weak self] (error, _) in
+            guard let this = self else { return }
+            
+            if let error = error {
+                this.present(this.alertVC(title: "Error saving to database", message: error), animated: true, completion: nil)
             }
             
-            let values = ["text": text, "toId": toId, "fromId": fromId, "timestamp": "\(Date().timeIntervalSince1970)"]
-        
-            DatabaseService.instance.saveData(uid: nil, type: .message, data: values as Dictionary<String, AnyObject>, fan: true) { [weak self] (error, _) in
-                guard let this = self else { return }
-                
-                if let error = error {
-                    this.present(this.alertVC(title: "Error saving to database", message: error), animated: true, completion: nil)
-                }
-                
-                this.inputTextField.text = nil
-            }
+            this.inputTextField.text = nil
         }
     }
     
@@ -243,6 +257,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         
         if let text = message.text {
             cell.bubbleWidthConstraint?.constant = estimateFrame(text: text).width + contentOffset * 3
+        } else if message.imageUrl != nil {
+            cell.bubbleWidthConstraint?.constant = messageImageWidth
         }
         
         return cell
@@ -278,8 +294,14 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if let text = messages[indexPath.item].text {
+        
+        let message = messages[indexPath.item]
+        
+        if let text = message.text {
             cellHeight = estimateFrame(text: text).height + contentOffset * 2
+        } else if let imageWidth = message.imageWidth?.floatValue, let imageHeight = message.imageHeight?.floatValue {
+            
+            cellHeight = CGFloat(imageHeight / imageWidth) * messageImageWidth
         }
         
         let width = UIScreen.main.bounds.width

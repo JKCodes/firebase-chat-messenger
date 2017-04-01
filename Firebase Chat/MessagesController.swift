@@ -81,9 +81,8 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
             guard let this = self else { return }
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
-                let message = Message()
-                message.setValuesForKeys(dictionary)
-                this.messages.append(message)
+                let message = Message(dictionary: dictionary)
+//                this.messages.append(message)
                 
                 if let chatPartnerId = message.chatPartnerId() {
                     this.messagesDictionary[chatPartnerId] = message

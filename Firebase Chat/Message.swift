@@ -16,8 +16,23 @@ class Message: NSObject {
 
     var text: String?
     var imageUrl: String?
+    var imageWidth: NSNumber?
+    var imageHeight: NSNumber?
     
     func chatPartnerId() -> String? {
         return fromId == AuthenticationService.instance.currentId() ? toId : fromId
+    }
+    
+    init(dictionary: [String: AnyObject]) {
+        super.init()
+        
+        fromId = dictionary["fromId"] as? String
+        text = dictionary["text"] as? String
+        timestamp = dictionary["timestamp"] as? String
+        toId = dictionary["toId"] as? String
+
+        imageUrl = dictionary["imageUrl"] as? String
+        imageWidth = dictionary["imageWidth"] as? NSNumber
+        imageHeight = dictionary["imageHeight"] as? NSNumber
     }
 }

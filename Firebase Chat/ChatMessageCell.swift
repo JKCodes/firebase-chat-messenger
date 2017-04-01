@@ -30,6 +30,7 @@ class ChatMessageCell: UICollectionViewCell {
         tv.font = .systemFont(ofSize: ChatMessageCell.textViewFontSize)
         tv.backgroundColor = .clear
         tv.textColor = .white
+        tv.isEditable = false
         return tv
     }()
     

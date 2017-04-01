@@ -11,17 +11,16 @@ import AVFoundation
 
 class ChatMessageCell: UICollectionViewCell {
     
-    private let bubbleViewWidth: CGFloat = 200
-    
+    fileprivate let bubbleViewWidth: CGFloat = 200
     internal static let textViewFontSize: CGFloat = 16
     internal static let cellWidth: CGFloat = 200
     internal static let cellHeightMinusContents: CGFloat = 20
-    private let contentOffset: CGFloat = 8
+    fileprivate let contentOffset: CGFloat = 8
     internal static let blueColor: UIColor = .rgb(r: 0, g: 137, b: 249)
-    private let profileImageLength: CGFloat = 32
-    private static let profileImageRadius: CGFloat = 16
-    private let playButtonLength: CGFloat = 50
-    private let aivLength: CGFloat = 50
+    fileprivate let profileImageLength: CGFloat = 32
+    fileprivate static let profileImageRadius: CGFloat = 16
+    fileprivate let playButtonLength: CGFloat = 50
+    fileprivate let aivLength: CGFloat = 50
     
     internal var bubbleWidthConstraint: NSLayoutConstraint?
     internal var bubbleRightConstraint: NSLayoutConstraint?
@@ -31,8 +30,8 @@ class ChatMessageCell: UICollectionViewCell {
     
     var message: Message?
     
-    var player: AVPlayer?
-    var playerLayer: AVPlayerLayer?
+    fileprivate var player: AVPlayer?
+    fileprivate var playerLayer: AVPlayerLayer?
     
     
     let activityIndicatorView: UIActivityIndicatorView = {
@@ -125,10 +124,16 @@ class ChatMessageCell: UICollectionViewCell {
         NotificationCenter.default.removeObserver(self)
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension ChatMessageCell {
     func handlePlay() {
         if let videoUrlString = message?.videoUrl, let url = URL(string: videoUrlString) {
             player = AVPlayer(url: url)
-    
+            
             playerLayer = AVPlayerLayer(player: player)
             playerLayer?.frame = bubbleView.bounds
             bubbleView.layer.addSublayer(playerLayer!)
@@ -152,7 +157,7 @@ class ChatMessageCell: UICollectionViewCell {
         resetPlayer()
     }
     
-    private func resetPlayer() {
+    fileprivate func resetPlayer() {
         playerLayer?.removeFromSuperlayer()
         player?.pause()
         activityIndicatorView.stopAnimating()
@@ -163,9 +168,4 @@ class ChatMessageCell: UICollectionViewCell {
         guard let imageView = tapGesture.view as? UIImageView else { return }
         delegate?.performZoomInfoStartingImageView(startingImageView: imageView)
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }

@@ -10,10 +10,10 @@ import UIKit
 
 class UserCell: UITableViewCell {
     
-    private let profileImageLength: CGFloat = 48
-    private static let profileImageRadius: CGFloat = 24
-    private let timeLabelWidth: CGFloat = 100
-    private let contentOffset: CGFloat = 8
+    fileprivate let profileImageLength: CGFloat = 48
+    fileprivate static let profileImageRadius: CGFloat = 24
+    fileprivate let timeLabelWidth: CGFloat = 100
+    fileprivate let contentOffset: CGFloat = 8
     
     var message: Message? {
         didSet {
@@ -84,8 +84,15 @@ class UserCell: UITableViewCell {
         
     }
     
-    private func setupNameAndProfileImage() {
-                
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+}
+
+extension UserCell {
+    fileprivate func setupNameAndProfileImage() {
+        
         if let id = message?.chatPartnerId() {
             DatabaseService.instance.retrieveSingleObject(queryString: id, type: .user, onComplete: { [weak self] (snapshot) in
                 if let dictionary = snapshot.value as? [String: AnyObject] {
@@ -109,9 +116,4 @@ class UserCell: UITableViewCell {
         
         detailTextLabel.frame = CGRect(x: 64, y: detailTextLabel.frame.origin.y + 2, width: detailTextLabel.frame.width, height: detailTextLabel.frame.height)
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }

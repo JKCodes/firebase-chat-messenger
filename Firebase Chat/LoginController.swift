@@ -10,11 +10,11 @@ import UIKit
 
 class LoginController: UIViewController, UITextFieldDelegate, Alerter {
     
-    private let contentOffset: CGFloat = 12
-    private let containerViewHeight: CGFloat = 150
-    private let loginButtonHeight: CGFloat = 50
-    private let profileImageLength: CGFloat = 150
-    private let segmentedControlHeight: CGFloat = 36
+    fileprivate let contentOffset: CGFloat = 12
+    fileprivate let containerViewHeight: CGFloat = 150
+    fileprivate let loginButtonHeight: CGFloat = 50
+    fileprivate let profileImageLength: CGFloat = 150
+    fileprivate let segmentedControlHeight: CGFloat = 36
     
     weak var delegate: LoginDelegate?
     

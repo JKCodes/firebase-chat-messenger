@@ -105,7 +105,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         }
     }
     
-    private func registerUserIntoDatabase(uid: String, values: [String: AnyObject]) {
+    fileprivate func registerUserIntoDatabase(uid: String, values: [String: AnyObject]) {
         DatabaseService.instance.saveData(uid: uid, type: .user, data: values) { [weak self] (error, data) in
             guard let this = self else { return }
             if let error = error {

@@ -10,9 +10,9 @@ import UIKit
 
 class MessagesController: UITableViewController, LoginDelegate, NewMessagesDelegate, Alerter {
     
-    private let cellId = "cellId"
-    private let contentHeight: CGFloat = 40
-    private static let contentRadius: CGFloat = 20
+    fileprivate let cellId = "cellId"
+    fileprivate let contentHeight: CGFloat = 40
+    fileprivate static let contentRadius: CGFloat = 20
     
     var messages = [Message]()
     var messagesDictionary = [String: Message]()
@@ -53,28 +53,6 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         
         tableView.allowsMultipleSelectionDuringEditing = true
     }
-
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-
-        let message = messages[indexPath.row]
-
-        guard let uid = AuthenticationService.instance.currentId(), let toId = message.chatPartnerId() else { return }
-        
-        DatabaseService.instance.removeMultipleObjects(type: .userMessages, fromId: uid, toId: toId) { [weak self] (error, _) in
-            guard let this = self else { return }
-
-            if let error = error {
-                this.present(this.alertVC(title: "Deletion request failed", message: error), animated: true, completion: nil)
-                return
-            }
-            
-            self?.messagesDictionary.removeValue(forKey: toId)
-        }
-    }
     
     func observeUserMessages() {
         
@@ -93,20 +71,7 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         }
     }
     
-    func handleReloadTable() {
-        messages = Array(messagesDictionary.values)
-        messages.sort { (message1, message2) -> Bool in
-            guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
-            
-            return Int(time1) > Int(time2)
-        }
-
-        DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadData()
-        }
-    }
-    
-    private func fetchMessage(messageId: String) {
+    fileprivate func fetchMessage(messageId: String) {
         DatabaseService.instance.retrieveSingleObject(queryString: messageId, type: .message, onComplete: { [weak self] (snapshot) in
             guard let this = self else { return }
             
@@ -122,7 +87,7 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         })
     }
     
-    private func attemptReloadOfTable() {
+    fileprivate func attemptReloadOfTable() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
     }
@@ -194,26 +159,27 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     
-    func handleNewMessage() {
-        let newMessageController = NewMessageController()
-        newMessageController.delegate = self
-        let navController = UINavigationController(rootViewController: newMessageController)
-        present(navController, animated: true, completion: nil)
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
     }
     
-    func handleLogout() {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        AuthenticationService.instance.signout { [weak self] (error, _) in
+        let message = messages[indexPath.row]
+        
+        guard let uid = AuthenticationService.instance.currentId(), let toId = message.chatPartnerId() else { return }
+        
+        DatabaseService.instance.removeMultipleObjects(type: .userMessages, fromId: uid, toId: toId) { [weak self] (error, _) in
             guard let this = self else { return }
+            
             if let error = error {
-                this.present(this.alertVC(title: "Error logging out", message: error), animated: true, completion: nil)
+                this.present(this.alertVC(title: "Deletion request failed", message: error), animated: true, completion: nil)
                 return
             }
+            
+            self?.messagesDictionary.removeValue(forKey: toId)
         }
-        
-        let loginController = LoginController()
-        loginController.delegate = self
-        present(loginController, animated: true, completion: nil)
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -246,6 +212,44 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
             user.setValuesForKeys(dictionary)
             self?.showChatController(user: user)
         }
+    }
+}
+
+extension MessagesController {
+    
+    func handleReloadTable() {
+        messages = Array(messagesDictionary.values)
+        messages.sort { (message1, message2) -> Bool in
+            guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
+            
+            return Int(time1) > Int(time2)
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
+    }
+    
+    func handleNewMessage() {
+        let newMessageController = NewMessageController()
+        newMessageController.delegate = self
+        let navController = UINavigationController(rootViewController: newMessageController)
+        present(navController, animated: true, completion: nil)
+    }
+    
+    func handleLogout() {
+        
+        AuthenticationService.instance.signout { [weak self] (error, _) in
+            guard let this = self else { return }
+            if let error = error {
+                this.present(this.alertVC(title: "Error logging out", message: error), animated: true, completion: nil)
+                return
+            }
+        }
+        
+        let loginController = LoginController()
+        loginController.delegate = self
+        present(loginController, animated: true, completion: nil)
     }
 }
 

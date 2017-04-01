@@ -10,12 +10,12 @@ import UIKit
 
 class ChatInputContainerView: UIView, UITextFieldDelegate {
     
-    private let buttonWidth: CGFloat = 80
-    private let buttonHeight: CGFloat = 50
-    private let contentOffset: CGFloat = 8
-    private let inputTextFieldHeight: CGFloat = 50
-    private let separatorHeight: CGFloat = 1
-    private let uploadImageLength: CGFloat = 44
+    fileprivate let buttonWidth: CGFloat = 80
+    fileprivate let buttonHeight: CGFloat = 50
+    fileprivate let contentOffset: CGFloat = 8
+    fileprivate let inputTextFieldHeight: CGFloat = 50
+    fileprivate let separatorHeight: CGFloat = 1
+    fileprivate let uploadImageLength: CGFloat = 44
 
     weak var delegate: ChatInputContainerViewDelegate? {
         didSet {
@@ -74,7 +74,9 @@ class ChatInputContainerView: UIView, UITextFieldDelegate {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+}
+
+extension ChatInputContainerView {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         delegate?.handleSend()
         return true

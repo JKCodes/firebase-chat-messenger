@@ -8,9 +8,7 @@
 
 import UIKit
 
-protocol Alerter {
-    
-}
+protocol Alerter {}
 
 extension Alerter {
     func alertVC(title: String, message: String) -> UIAlertController {

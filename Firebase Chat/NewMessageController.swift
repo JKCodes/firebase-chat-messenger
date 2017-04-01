@@ -10,8 +10,8 @@ import UIKit
 
 class NewMessageController: UITableViewController {
     
-    private let cellId = "cellId"
-    private let cellHeight: CGFloat = 72
+    fileprivate let cellId = "cellId"
+    fileprivate let cellHeight: CGFloat = 72
     
     var users = [User]()
     

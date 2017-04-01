@@ -32,7 +32,9 @@
 		D8D897A21E8E763A00A5BDAC /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A11E8E763A00A5BDAC /* ChatLogController.swift */; };
 		D8D897A41E8E7F1600A5BDAC /* Alerter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A31E8E7F1600A5BDAC /* Alerter.swift */; };
 		D8D897A61E8E871900A5BDAC /* NewMessagesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */; };
+		D8D94FFB1E9042D20004E225 /* ChatInputContainerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D94FFA1E9042D20004E225 /* ChatInputContainerViewDelegate.swift */; };
 		D8EEF9951E8FC96500BFD7AB /* ChatMessageDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EEF9941E8FC96500BFD7AB /* ChatMessageDelegate.swift */; };
+		D8EEF9971E903CDE00BFD7AB /* ChatInputContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EEF9961E903CDE00BFD7AB /* ChatInputContainerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,7 +67,9 @@
 		D8D897A11E8E763A00A5BDAC /* ChatLogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 		D8D897A31E8E7F1600A5BDAC /* Alerter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alerter.swift; sourceTree = "<group>"; };
 		D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessagesDelegate.swift; sourceTree = "<group>"; };
+		D8D94FFA1E9042D20004E225 /* ChatInputContainerViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatInputContainerViewDelegate.swift; sourceTree = "<group>"; };
 		D8EEF9941E8FC96500BFD7AB /* ChatMessageDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessageDelegate.swift; sourceTree = "<group>"; };
+		D8EEF9961E903CDE00BFD7AB /* ChatInputContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatInputContainerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +155,7 @@
 			children = (
 				D86F7F191E8D6DB400933F8D /* UserCell.swift */,
 				D8010FFA1E8EC4FF00D8C759 /* ChatMessageCell.swift */,
+				D8EEF9961E903CDE00BFD7AB /* ChatInputContainerView.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -184,6 +189,7 @@
 				D8D897A51E8E871900A5BDAC /* NewMessagesDelegate.swift */,
 				D8D897A31E8E7F1600A5BDAC /* Alerter.swift */,
 				D8EEF9941E8FC96500BFD7AB /* ChatMessageDelegate.swift */,
+				D8D94FFA1E9042D20004E225 /* ChatInputContainerViewDelegate.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -335,9 +341,11 @@
 				D86F7F121E8D4C5B00933F8D /* LoginController.swift in Sources */,
 				D86F7F1C1E8D713100933F8D /* LoginController+handlers.swift in Sources */,
 				D8D897A61E8E871900A5BDAC /* NewMessagesDelegate.swift in Sources */,
+				D8D94FFB1E9042D20004E225 /* ChatInputContainerViewDelegate.swift in Sources */,
 				D86F7F0F1E8D4C4000933F8D /* UIColor + rgb.swift in Sources */,
 				D86F7F231E8D7F7F00933F8D /* AuthenticationService.swift in Sources */,
 				D8010FF91E8E975B00D8C759 /* Message.swift in Sources */,
+				D8EEF9971E903CDE00BFD7AB /* ChatInputContainerView.swift in Sources */,
 				D8EEF9951E8FC96500BFD7AB /* ChatMessageDelegate.swift in Sources */,
 				D86F7F181E8D6CBE00933F8D /* User.swift in Sources */,
 				D86F7F241E8D7F7F00933F8D /* DatabaseService.swift in Sources */,

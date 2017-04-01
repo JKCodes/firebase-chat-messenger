@@ -10,18 +10,13 @@ import UIKit
 import MobileCoreServices
 import AVFoundation
 
-class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChatMessageDelegate, Alerter {
+class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChatMessageDelegate, ChatInputContainerViewDelegate, Alerter {
     
     private let cellId = "cellId"
     
     private var cellHeight: CGFloat = 80
     private let containerViewHeight: CGFloat = 50
-    private let buttonWidth: CGFloat = 80
-    private let buttonHeight: CGFloat = 50
-    private let inputTextFieldHeight: CGFloat = 50
     private let contentOffset: CGFloat = 8
-    private let separatorHeight: CGFloat = 1
-    private let uploadImageLength: CGFloat = 44
     private let messageImageWidth: CGFloat = 200
     
     private var containerViewBottomConstraint: NSLayoutConstraint?
@@ -47,56 +42,12 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         return view
     }()
     
-    lazy var sendButton: UIButton = { [weak self] in
-        guard let this = self else { return UIButton() }
-        let button = UIButton(type: .system)
-        button.setTitle("Send", for: .normal)
-        button.addTarget(this, action: #selector(handleSend), for: .touchUpInside)
-        return button
-    }()
-    
-    lazy var inputTextField: UITextField = { [weak self] in
-        guard let this = self else { return UITextField() }
-        let tf = UITextField()
-        tf.placeholder = "Enter message..."
-        tf.delegate = this
-        return tf
-    }()
-    
-    let separatorView: UIView = {
-        let sv = UIView()
-        sv.backgroundColor = .rgb(r: 220, g: 220, b: 220)
-        return sv
-    }()
-    
-    lazy var uploadImageView: UIImageView = { [weak self] in
-        guard let this = self else { return UIImageView() }
-        let iv = UIImageView()
-        iv.image = #imageLiteral(resourceName: "upload_image_icon")
-        iv.isUserInteractionEnabled = true
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: this, action: #selector(handleUploadTap)))
-        return iv
-    }()
-    
-    lazy var inputContainerView: UIView = { [weak self] in
-        guard let this = self else { return UIView() }
-        let containerView = UIView()
-        containerView.frame = CGRect(x: 0, y: 0, width: this.view.frame.width, height: this.containerViewHeight)
-        containerView.backgroundColor = .white
-        containerView.addSubview(this.sendButton)
-        containerView.addSubview(this.inputTextField)
-        containerView.addSubview(this.separatorView)
-        containerView.addSubview(this.uploadImageView)
-        
-        this.sendButton.anchor(top: nil, left: nil, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: this.buttonWidth, heightConstant: this.buttonHeight)
-        this.sendButton.anchorCenterYToSuperview()
-        this.inputTextField.anchor(top: nil, left: this.uploadImageView.rightAnchor, bottom: nil, right: this.sendButton.leftAnchor, topConstant: 0, leftConstant: this.contentOffset, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: this.inputTextFieldHeight)
-        this.inputTextField.anchorCenterYToSuperview()
-        this.separatorView.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: this.separatorHeight)
-        this.uploadImageView.anchor(top: nil, left: containerView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: this.uploadImageLength, heightConstant: this.uploadImageLength)
-        this.uploadImageView.anchorCenterYToSuperview()
-        
-        return containerView
+    lazy var inputContainerView: ChatInputContainerView = { [weak self] in
+        guard let this = self else { return ChatInputContainerView() }
+
+        let chatInputContainerView = ChatInputContainerView(frame: CGRect(x: 0, y: 0, width: this.view.frame.width, height: this.containerViewHeight))
+        chatInputContainerView.delegate = this
+        return chatInputContainerView
     }()
     
     override var inputAccessoryView: UIView? {
@@ -285,7 +236,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     func handleSend() {
-        guard let text = inputTextField.text else { return }
+        guard let text = inputContainerView.inputTextField.text else { return }
         
         let properties: [String: AnyObject] = ["text": text as AnyObject]
         
@@ -306,13 +257,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 this.present(this.alertVC(title: "Error saving to database", message: error), animated: true, completion: nil)
             }
             
-            this.inputTextField.text = nil
+            this.inputContainerView.inputTextField.text = nil
         }
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        handleSend()
-        return true
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

@@ -69,7 +69,7 @@ class ChatMessageCell: UICollectionViewCell {
     lazy var messageImageView: UIImageView = { [weak self] in
         guard let this = self else { return UIImageView() }
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = profileImageRadius
+        imageView.layer.cornerRadius = ChatMessageCell.profileImageRadius
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
@@ -130,7 +130,7 @@ class ChatMessageCell: UICollectionViewCell {
 }
 
 extension ChatMessageCell {
-    func handlePlay() {
+    @objc func handlePlay() {
         if let videoUrlString = message?.videoUrl, let url = URL(string: videoUrlString) {
             player = AVPlayer(url: url)
             
@@ -147,7 +147,7 @@ extension ChatMessageCell {
         }
     }
     
-    func playerItemDidReachEnd(notification: NSNotification) {
+    @objc func playerItemDidReachEnd(notification: NSNotification) {
         resetPlayer()
         playButton.isHidden = false
     }
@@ -163,7 +163,7 @@ extension ChatMessageCell {
         activityIndicatorView.stopAnimating()
     }
     
-    func handleZoomTap(tapGesture: UITapGestureRecognizer) {
+    @objc func handleZoomTap(tapGesture: UITapGestureRecognizer) {
         if message?.videoUrl != nil { return }
         guard let imageView = tapGesture.view as? UIImageView else { return }
         delegate?.performZoomInfoStartingImageView(startingImageView: imageView)

@@ -217,7 +217,7 @@ class MessagesController: UITableViewController, LoginDelegate, NewMessagesDeleg
 
 extension MessagesController {
     
-    func handleReloadTable() {
+    @objc func handleReloadTable() {
         messages = Array(messagesDictionary.values)
         messages.sort { (message1, message2) -> Bool in
             guard let m1 = message1.timestamp, let m2 = message2.timestamp, let time1 = Double(m1), let time2 = Double(m2) else { return true }
@@ -230,14 +230,14 @@ extension MessagesController {
         }
     }
     
-    func handleNewMessage() {
+    @objc func handleNewMessage() {
         let newMessageController = NewMessageController()
         newMessageController.delegate = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
     
-    func handleLogout() {
+    @objc func handleLogout() {
         
         AuthenticationService.instance.signout { [weak self] (error, _) in
             guard let this = self else { return }

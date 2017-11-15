@@ -79,7 +79,7 @@ class NewMessageController: UITableViewController {
 }
 
 extension NewMessageController {
-    func handleCancel() {
+    @objc func handleCancel() {
         dismiss(animated: true, completion: nil)
     }
 }

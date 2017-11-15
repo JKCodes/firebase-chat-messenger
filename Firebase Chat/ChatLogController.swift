@@ -345,7 +345,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     fileprivate func estimateFrame(text: String) -> CGRect {
         let size = CGSize(width: ChatMessageCell.cellWidth, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: ChatMessageCell.textViewFontSize)]
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: ChatMessageCell.textViewFontSize)]
         
         return NSString(string: text).boundingRect(with: size, options: options, attributes: attributes, context: nil)
     }
@@ -359,7 +359,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
 /// Collection of button selector and Tap Gesture selectors
 extension ChatLogController {
     
-    func handleKeyboardDidShow() {
+    @objc func handleKeyboardDidShow() {
         if messages.count > 0 {
             let indexPath = IndexPath(item: messages.count - 1, section: 0)
             collectionView?.scrollToItem(at: indexPath, at: .top, animated: true)
@@ -385,7 +385,7 @@ extension ChatLogController {
     }
 
     
-    func handleZoomOut(tapGesture: UITapGestureRecognizer) {
+    @objc func handleZoomOut(tapGesture: UITapGestureRecognizer) {
         guard let startFrame = startingFrame, let zoomOutImageView = zoomingImageView else { return }
         zoomOutImageView.layer.cornerRadius = 16
         zoomOutImageView.clipsToBounds = true
